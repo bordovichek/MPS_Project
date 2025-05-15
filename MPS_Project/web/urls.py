@@ -1,6 +1,7 @@
-from django.urls import path
-from .views import airplane_list
+from django.contrib import admin
+from django.urls import path, include
 
 urlpatterns = [
-    path('', airplane_list, name='airplane_list'),
+    path('admin/', admin.site.urls),
+    path('', include('core.urls')),
 ]
