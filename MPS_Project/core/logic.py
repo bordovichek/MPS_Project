@@ -4,6 +4,7 @@ import math
 EARTH_RAD=6378
 
 def convert_from_coord_str_to_degrees(coord):
+    #Чтоб долго не думать как записи типа 12°34'56" N переводить в float вид
     minus=False
     coord=coord.lower()
     res=0
@@ -18,6 +19,8 @@ def convert_from_coord_str_to_degrees(coord):
     return  res
 
 def haversine(lat1,long1,lat2,long2):
+    #Это чтоб считать расстояние между 2 точками на шаре
+    
     lat1 = math.radians(lat1)
     long1 = math.radians(long1)
     lat2 = math.radians(lat2)
