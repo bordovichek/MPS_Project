@@ -2,7 +2,7 @@ from rest_framework.exceptions import NotFound
 
 
 class CaseInsensitiveLookupMixin:
-    """Миксин для того чтобы у нас поиск был нечувствителен к регистру"""
+    """Миксин для того чтобы у нас поиск в поисковой строке был нечувствителен к регистру"""
     lookup_field = None
 
     def get_object(self):
