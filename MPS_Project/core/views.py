@@ -1,4 +1,6 @@
 from rest_framework import generics
+
+from .mixins import CaseInsensitiveLookupMixin
 from .models_dir import Airplane, Airport
 from .serializers import AirplaneSerializer, AirportSerializer
 
@@ -13,13 +15,13 @@ class AirportListView(generics.ListAPIView):
     serializer_class = AirportSerializer
 
 
-class AirplaneDetailView(generics.RetrieveAPIView):
+class AirplaneDetailView(CaseInsensitiveLookupMixin, generics.RetrieveAPIView):
     queryset = Airplane.objects.all()
     serializer_class = AirplaneSerializer
     lookup_field = "name"
 
 
-class AirportDetailView(generics.RetrieveAPIView):
+class AirportDetailView(CaseInsensitiveLookupMixin, generics.RetrieveAPIView):
     queryset = Airport.objects.all()
     serializer_class = AirportSerializer
-    lookup_field = "iata_code"  # Поиск по IATA-коду
+    lookup_field = "iata_code"
