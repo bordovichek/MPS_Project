@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models_dir import Airplane, Airport
+from core.models_dir import Airplane, Airport
 
 
 class AirplaneSerializer(serializers.ModelSerializer):

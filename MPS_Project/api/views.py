@@ -2,7 +2,7 @@ from rest_framework import generics
 
 from core.mixins import CaseInsensitiveLookupMixin
 from core.models_dir import Airplane, Airport
-from core.serializers import AirplaneSerializer, AirportSerializer
+from .serializers import AirplaneSerializer, AirportSerializer
 
 
 class AirplaneListView(generics.ListAPIView):

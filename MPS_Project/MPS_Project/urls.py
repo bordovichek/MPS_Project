@@ -20,5 +20,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),  # API
-    path('', include('web.urls')),      # HTML-фронт
+    path('', include('web.urls')),      # web
 ]
+handler404 = 'core.views.custom_404_handler'
