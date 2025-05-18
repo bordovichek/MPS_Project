@@ -8,4 +8,4 @@ class AirplaneAdmin(admin.ModelAdmin):
 
 @admin.register(Airport)
 class AirportAdmin(admin.ModelAdmin):
-    list_display = ('iata_code', 'country', 'city', 'rus_city', 'latitude', 'longitude')
+    list_display = ('iata_code', 'country', 'name', 'latitude', 'longitude')

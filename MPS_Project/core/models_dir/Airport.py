@@ -4,8 +4,8 @@ from django.db import models
 class Airport(models.Model):
     iata_code = models.CharField("IATA код", max_length=3, unique=True, blank=True)
     country = models.CharField("Страна", max_length=100)
-    city = models.CharField("Город", max_length=100)
-    rus_city = models.CharField("Город НА РУССКОМ", max_length=100, null=True, blank=True)
+    name = models.CharField("название", max_length=100)
+    #city = models.CharField("Город", max_length=100)
     latitude = models.FloatField("Широта", default=0.0)
     longitude = models.FloatField("Долгота", default=0.0)
 
