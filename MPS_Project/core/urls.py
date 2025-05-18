@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import AirplaneListView, AirportListView, AirplaneDetailView, AirportDetailView
+
+from api.views import AirplaneDetailView, AirplaneListView, AirportDetailView, AirportListView
 
 urlpatterns = [
     path('airplanes/<str:name>/', AirplaneDetailView.as_view(), name='airplane-detail'),

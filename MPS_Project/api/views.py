@@ -1,8 +1,8 @@
 from rest_framework import generics
 
-from MPS_Project.core.mixins import CaseInsensitiveLookupMixin
-from MPS_Project.core.models_dir import Airplane, Airport
-from MPS_Project.core.serializers import AirplaneSerializer, AirportSerializer
+from core.mixins import CaseInsensitiveLookupMixin
+from core.models_dir import Airplane, Airport
+from core.serializers import AirplaneSerializer, AirportSerializer
 
 
 class AirplaneListView(generics.ListAPIView):

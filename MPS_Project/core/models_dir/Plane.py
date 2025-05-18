@@ -2,11 +2,11 @@ from django.db import models
 
 
 class Airplane(models.Model):
-    name = models.CharField("Название самолета", max_length=50, unique=True)
+    name = models.CharField("Название самолета", max_length=50, default="Boeing")
     year_of_manufacture = models.PositiveIntegerField("Год выпуска", null=True, blank=True)
     capacity = models.PositiveIntegerField("Вместимость пассажиров", null=True, blank=True)
     engine_power = models.PositiveIntegerField("Мощность двигателя (л.с.)", null=True, blank=True)
-    consumption = models.IntegerField("Расход топлива (кг/час)")
+    consumption = models.IntegerField("Расход топлива (кг/час)", default=8000)
 
     def __str__(self):
         return (
