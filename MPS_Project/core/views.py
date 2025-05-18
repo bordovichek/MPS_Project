@@ -1,6 +1,6 @@
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import redirect
-from django.urls import reverse
+
 
 def home(request):
     html = """
@@ -13,6 +13,6 @@ def home(request):
     """
     return HttpResponse(html)
 
+
 def custom_404_handler(request, exception):
-    # Редирект на главную страницу
     return redirect('/')
