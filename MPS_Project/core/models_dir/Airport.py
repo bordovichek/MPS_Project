@@ -1,10 +1,10 @@
 from django.db import models
-
+from django.core.cache import cache
 
 class Airport(models.Model):
     iata_code = models.CharField("IATA код", max_length=3, unique=True, blank=True)
     country = models.CharField("Страна", max_length=100)
-    name = models.CharField("название", max_length=100, default='NameOfAirport')
+    name = models.CharField("название", max_length=100, default="NameOfAirport")
     #city = models.CharField("Город", max_length=100)
     latitude = models.FloatField("Широта", default=0.0)
     longitude = models.FloatField("Долгота", default=0.0)
@@ -30,3 +30,11 @@ class Airport(models.Model):
             f"{self.country}, "
             f"Координаты: {self.latitude}, {self.longitude}"
         )
+
+def get_all_airports():
+    airports = cache.get("airports_all")
+    if not(airports):
+        airports = list(Airport.objects.all())
+        cache.set("airports_all",airports,timeout=300)#щас 5 минут, потом бы поменять на побольше
+    return airports
+
