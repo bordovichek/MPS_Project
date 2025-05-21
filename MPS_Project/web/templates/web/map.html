@@ -1,0 +1,192 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>FlightFinder</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body { background: #fff5e1; font-family: sans-serif; }
+        #map { height: 600px; width: 100%; border-radius: 10px; }
+        .form-area {
+            margin-bottom: 20px;
+            display: flex; /* Используем flexbox для размещения элементов в строку */
+            flex-wrap: wrap; /* Разрешаем перенос на новую строку, если места мало */
+            gap: 20px; /* Отступы между элементами */
+        }
+        .select-group {
+            display: flex;
+            flex-direction: column; /* Элементы в группе будут располагаться вертикально */
+        }
+        select { padding: 6px; margin: 10px 0; display: block; }
+        input[type="text"] {
+            padding: 6px;
+            margin: 10px 0;
+            display: block;
+            width: 200px; /* Можно настроить ширину поля ввода */
+        }
+    </style>
+</head>
+<body>
+    <h2>MPS Project</h2>
+    <div class="form-area">
+        <div class="select-group">
+            <label for="airport1">Выберите аэропорт 1:</label>
+            <select id="airport1">
+                <option value="">--</option>
+                {% for a in airports %}
+                    <option value="{{ a.iata_code }}" data-lat="{{ a.latitude }}" data-lon="{{ a.longitude }}" data-name="{{ a.name }}">
+                        {{ a.name }} ({{ a.iata_code }})
+                    </option>
+                {% endfor %}
+            </select>
+            <input type="text" id="searchAirport1" placeholder="Поиск Аэропорта 1 (имя/IATA)">
+        </div>
+
+        <div class="select-group">
+            <label for="airport2">Выберите аэропорт 2:</label>
+            <select id="airport2" disabled>
+                <option value="">--</option>
+                {% for a in airports %}
+                    <option value="{{ a.iata_code }}" data-lat="{{ a.latitude }}" data-lon="{{ a.longitude }}" data-name="{{ a.name }}">
+                        {{ a.name }} ({{ a.iata_code }})
+                    </option>
+                {% endfor %}
+            </select>
+            <input type="text" id="searchAirport2" placeholder="Поиск Аэропорта 2 (имя/IATA)">
+        </div>
+
+        <div class="select-group">
+            <label for="aircraft">Выберите самолет:</label>
+            <select id="aircraft">
+                <option value="">--</option>
+                {% for a in aircrafts %}
+                    <option value="{{ a.name }}">{{ a.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('map').setView([20, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        const airport1Select = document.getElementById('airport1');
+        const airport2Select = document.getElementById('airport2');
+        const aircraftSelect = document.getElementById('aircraft');
+
+        const searchAirport1Input = document.getElementById('searchAirport1');
+        const searchAirport2Input = document.getElementById('searchAirport2');
+
+        let markers = [];
+        // Сохраним исходные опции, чтобы можно было сбрасывать фильтр
+        const originalAirport1Options = Array.from(airport1Select.options);
+        const originalAirport2Options = Array.from(airport2Select.options);
+
+        function clearMarkers() {
+            markers.forEach(m => map.removeLayer(m));
+            markers = [];
+        }
+
+        // Функция для фильтрации опций в выпадающем списке
+        function filterAirportOptions(selectElement, searchInput, originalOptions) {
+            const searchText = searchInput.value.toLowerCase();
+            selectElement.innerHTML = ''; // Очищаем текущие опции
+
+            // Всегда добавляем пустую опцию
+            const defaultOption = document.createElement('option');
+            defaultOption.value = "";
+            defaultOption.textContent = "--";
+            selectElement.appendChild(defaultOption);
+
+            originalOptions.forEach(option => {
+                if (option.value === "") return; // Пропускаем пустую опцию из оригинальных
+
+                const airportName = option.dataset.name ? option.dataset.name.toLowerCase() : '';
+                const iataCode = option.value.toLowerCase();
+
+                if (airportName.includes(searchText) || iataCode.includes(searchText)) {
+                    selectElement.appendChild(option.cloneNode(true)); // Добавляем копию опции
+                }
+            });
+
+            // Если выбранный элемент не попал под фильтр, сбрасываем выбор
+            if (!Array.from(selectElement.options).some(opt => opt.selected)) {
+                selectElement.value = "";
+            }
+            selectElement.dispatchEvent(new Event('change')); // Запускаем событие change для обновления зависимых полей
+        }
+
+
+        // Обработчики событий для полей поиска
+        searchAirport1Input.addEventListener('input', () => {
+            filterAirportOptions(airport1Select, searchAirport1Input, originalAirport1Options);
+        });
+
+        searchAirport2Input.addEventListener('input', () => {
+            filterAirportOptions(airport2Select, searchAirport2Input, originalAirport2Options);
+        });
+
+
+        airport1Select.addEventListener('change', () => {
+            clearMarkers();
+            if (airport1Select.value) {
+                airport2Select.disabled = false; // Разблокировать airport2 после выбора airport1
+            } else {
+                airport2Select.disabled = true; // Заблокировать, если airport1 не выбран
+                airport2Select.value = ""; // Сбросить выбор airport2, если airport1 сброшен
+            }
+            // Также сбрасываем поле поиска второго аэропорта, если первый аэропорт сброшен
+            if (!airport1Select.value) {
+                 searchAirport2Input.value = "";
+                 filterAirportOptions(airport2Select, searchAirport2Input, originalAirport2Options);
+            }
+        });
+
+        airport2Select.addEventListener('change', () => {
+            clearMarkers();
+            const airport1Option = airport1Select.selectedOptions[0];
+            const airport2Option = airport2Select.selectedOptions[0];
+
+            if (airport1Option && airport2Option && airport1Option.value && airport2Option.value) {
+                const lat1 = parseFloat(airport1Option.dataset.lat);
+                const lon1 = parseFloat(airport1Option.dataset.lon);
+                const lat2 = parseFloat(airport2Option.dataset.lat);
+                const lon2 = parseFloat(airport2Option.dataset.lon);
+
+                const m1 = L.circleMarker([lat1, lon1], { radius: 6, color: 'red', fillColor: 'red', fillOpacity: 0.8 }).addTo(map);
+                const m2 = L.circleMarker([lat2, lon2], { radius: 6, color: 'red', fillColor: 'red', fillOpacity: 0.8 }).addTo(map);
+                markers.push(m1, m2);
+
+                // Автофокус на точках
+                const bounds = L.latLngBounds([[lat1, lon1], [lat2, lon2]]);
+                map.fitBounds(bounds.pad(0.5));
+            }
+        });
+
+        // Самолет всегда доступен, нет дополнительной логики для aircraftSelect
+        // aircraftSelect.addEventListener('change', () => { /* ... */ });
+
+        // Инициализация:
+        // Убедимся, что airport2 и searchAirport2 заблокированы при загрузке страницы
+        airport2Select.disabled = true;
+        searchAirport2Input.disabled = true; // Блокируем поле поиска для второго аэропорта
+        // Добавляем обработчик на airport1Select, чтобы разблокировать searchAirport2Input
+        airport1Select.addEventListener('change', () => {
+            if (airport1Select.value) {
+                airport2Select.disabled = false;
+                searchAirport2Input.disabled = false; // Разблокируем поле поиска для второго аэропорта
+            } else {
+                airport2Select.disabled = true;
+                airport2Select.value = "";
+                searchAirport2Input.disabled = true; // Заблокируем поле поиска
+                searchAirport2Input.value = ""; // Очистим поле поиска
+                filterAirportOptions(airport2Select, searchAirport2Input, originalAirport2Options); // Сбросим фильтр
+            }
+        }, true); // Используем capture phase, чтобы убедиться, что он срабатывает раньше
+    </script>
+</body>
+</html>

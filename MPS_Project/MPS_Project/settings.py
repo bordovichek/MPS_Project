@@ -14,7 +14,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 
-load_dotenv()  # Загрузка переменных из .env
+load_dotenv()
 OPENAIP_API_KEY = os.getenv("OPENAIP_API_KEY")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

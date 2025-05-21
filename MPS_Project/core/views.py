@@ -9,6 +9,7 @@ def home(request):
     <ul>
         <li><a href="/airplanes/">Список самолетов</a></li>
         <li><a href="/airports/">Список аэропортов</a></li>
+        <li><a href="/map/">Карта</a></li>
     </ul>
     """
     return HttpResponse(html)

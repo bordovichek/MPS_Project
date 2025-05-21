@@ -5,7 +5,7 @@ from core.models_dir import Airport
 API_KEY = OPENAIP_API_KEY
 
 
-def get_airports_from_openaip(limit: int = 1000, country_code: str = "US", page : int = 1):
+def get_airports_from_openaip(limit: int = 1000, country_code: str = "RU", page : int = 1):
     url = "https://api.core.openaip.net/api/airports"
     headers = {
         "x-openaip-api-key": API_KEY
