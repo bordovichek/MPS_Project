@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.cache import cache
-from sympy import Plane
+
 
 
 class Airplane(models.Model):
