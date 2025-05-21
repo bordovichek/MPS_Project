@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.cache import cache
-from sympy import Plane
+
 
 
 class Airplane(models.Model):
@@ -26,6 +26,6 @@ class Airplane(models.Model):
 def get_all_planes():
     planes = cache.get("planes_all")
     if not(planes):
-        planes = list(Plane.objects.all())
+        planes = list(Airplane.objects.all())
         cache.set("planes_all", planes, timeout=300)#щас 5 минут, потом бы поменять на побольше
     return planes
