@@ -27,5 +27,5 @@ def get_all_planes():
     planes = cache.get("planes_all")
     if not(planes):
         planes = list(Plane.objects.all())
-        cache.set("planes_all",planes,timeout=300)#щас 5 минут, потом бы поменять на побольше
+        cache.set("planes_all", planes, timeout=300)#щас 5 минут, потом бы поменять на побольше
     return planes

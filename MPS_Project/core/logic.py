@@ -50,7 +50,7 @@ def haversine(lat1, long1, lat2, long2):
     c = 2 * math.asin(math.sqrt(a))
     return c * EARTH_RAD
 
-def get_best_route_with_plane(route,plane):
+def get_best_route_with_plane(route, plane):
     """в route нужны iata коды"""
     res=[]
     plane_cant=False
@@ -59,7 +59,7 @@ def get_best_route_with_plane(route,plane):
     while i<len(route)-1:
 
         try:
-            res.append(json.loads(dijkstra(route[i], route[i+1],md)))
+            res.append(json.loads(dijkstra(route[i], route[i+1], md)))
             i+=1
 
         except Exception as e:
@@ -77,8 +77,8 @@ def get_best_route_with_plane(route,plane):
     flights=0
     for i in res:
         flights+=len(i["routes"])
-        max_dist=max(i["max_dist"],max_dist)
-        whole_dist+=i["whole_dist"]
+        max_dist=max(i["max_distance"], max_dist)
+        whole_dist+=i["whole_distance"]
     if not(plane_cant):
         time=whole_dist / float(plane.cruise_speed)
         cost=float(plane.consumption)* time *KEROSINE_PRICE
@@ -87,9 +87,9 @@ def get_best_route_with_plane(route,plane):
            "plane_cant" : False,
             "cost" : cost,
            "flights":flights,
-           "whole_dist" : whole_dist,
+           "whole_distance" : whole_dist,
            "time" : time,
-           "max_dist": max_dist,
+           "max_distance": max_dist,
            "route":res
         }
     else:
@@ -97,8 +97,8 @@ def get_best_route_with_plane(route,plane):
            "plane_selected" : True,
            "plane_cant": True,
            "flights":flights,
-           "whole_dist" : whole_dist,
-           "max_dist": max_dist,
+           "whole_distance" : whole_dist,
+           "max_distance": max_dist,
            "route":res
         }
     return json.dumps(d)
@@ -122,21 +122,21 @@ def get_best_route_without_plane(route):
     flights = 0
     for i in res:
         flights += len(i["routes"])
-        max_dist = max(i["max_dist"], max_dist)
-        whole_dist += i["whole_dist"]
+        max_dist = max(i["max_distance"], max_dist)
+        whole_dist += i["whole_distance"]
 
     d = {
          "plane_selected": False,
          "flights": flights,
-         "whole_dist": whole_dist,
-         "max_dist": max_dist,
+         "whole_distance": whole_dist,
+         "max_distance": max_dist,
          "route": res
          }
     return json.dumps(d)
 
 
 
-def dijkstra(start,end,max_dist):
+def dijkstra(start, end, max_dist):
     airs = get_all_airports()
     airports_by_code = {a.iata_code: a for a in airs}
     graph = {i.iata_code:{} for i in airs}
@@ -181,13 +181,13 @@ def dijkstra(start,end,max_dist):
                        "dest_lat": a2.latitide,
                        "dest_long": a2.longitude,
                        "dist":graph[prev[t]][t],
-                       "inbetween":get_points_inbetween(a1.latitide,a1.longitude,a2.latitide,a2.longitude,graph[prev[t]][t])})
+                       "inbetween":get_points_inbetween(a1.latitide, a1.longitude, a2.latitide, a2.longitude, graph[prev[t]][t])})
         whole_dist+=graph[prev[t]][t]
-        max_dist=max(graph[prev[t]][t],max_dist)
+        max_dist=max(graph[prev[t]][t], max_dist)
         t = prev[t]
     routes.reverse()
 
-    js={"routes" : [],"max_dist" : max_dist,"whole_dist" : whole_dist}
+    js={"routes" : [], "max_distance" : max_dist, "whole_distance" : whole_dist}
     for i in routes:
         js["routes"].append({f"{i['start']}-{i['dest']}" : i})
     return json.dumps(js)

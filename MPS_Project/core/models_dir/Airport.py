@@ -35,6 +35,6 @@ def get_all_airports():
     airports = cache.get("airports_all")
     if not(airports):
         airports = list(Airport.objects.all())
-        cache.set("airports_all",airports,timeout=300)#щас 5 минут, потом бы поменять на побольше
+        cache.set("airports_all", airports, timeout=300)#щас 5 минут, потом бы поменять на побольше
     return airports
 
