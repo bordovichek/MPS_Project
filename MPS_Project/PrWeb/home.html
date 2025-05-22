@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная страница</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+            color: #333;
+            text-align: center;
+            overflow: hidden;
+            position: relative; 
+
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        .light-effect {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none; 
+            z-index: 0; 
+        }
+
+
+        .light-effect:nth-child(1) {
+            top: -50px;
+            left: -50px;
+            animation: lightMove 20s linear infinite alternate;
+        }
+
+        .light-effect:nth-child(2) {
+            top: auto;
+            bottom: -50px;
+            left: auto;
+            right: -50px;
+            width: 180px;
+            height: 180px;
+            animation: lightMove 25s linear infinite alternate-reverse;
+        }
+
+        .light-effect:nth-child(3) {
+            top: 20%;
+            left: 80%;
+            width: 150px;
+            height: 150px;
+            animation: lightMove 18s ease-in-out infinite alternate-reverse;
+            animation-delay: 2s; 
+        }
+
+        .light-effect:nth-child(4) {
+            bottom: 10%;
+            left: 10%;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 70%); 
+            animation: lightMove 22s linear infinite alternate;
+            animation-delay: 4s;
+        }
+
+        @keyframes lightMove {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            25% { transform: translate(calc(100vw - 100px), calc(100vh - 100px)) scale(1.1); opacity: 0.6; }
+            50% { transform: translate(calc(100vw / 2), 0) scale(0.9); opacity: 0.4; }
+            75% { transform: translate(0, calc(100vh - 100px)) scale(1.2); opacity: 0.7; }
+            100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.92);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2), 0 5px 10px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease; 
+            animation: fadeIn 1s ease-out;
+            position: relative; 
+            z-index: 1; 
+        }
+
+        .container:hover {
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), 0 8px 15px rgba(0, 0, 0, 0.15); 
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.8em;
+            color: #1f4e79;
+            margin-bottom: 15px; 
+            animation: slideInDown 0.8s ease-out;
+        }
+
+        .slogan {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 35px; 
+            animation: fadeIn 1s ease-out 0.3s backwards; 
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 25px;
+            margin-top: 20px;
+            animation: fadeInUp 1s ease-out 0.5s;
+            animation-fill-mode: backwards;
+        }
+
+        .button {
+            background-color: #1E90FF;
+            color: white;
+            border: none;
+            padding: 18px 35px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1.15em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 87, 184, 0.3);
+            clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px), 0 15px);
+            position: relative; 
+            overflow: hidden; 
+            z-index: 1; 
+        }
+
+        .button i {
+            margin-right: 10px;
+        }
+
+        .button:hover {
+            background-color: #1C7ED6;
+            transform: translateY(-4px) scale(1.03) perspective(1000px) rotateX(3deg); 
+            box-shadow: 0 8px 20px rgba(0, 87, 184, 0.4);
+        }
+
+        .button:active {
+            transform: translateY(-2px) scale(1.01);
+            background-color: #1A75C4;
+        }
+
+        
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7); 
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            z-index: 0; 
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4); 
+                opacity: 0; 
+            }
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideInDown {
+            from { transform: translateY(-60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Для небольших экранов */
+        @media (max-width: 700px) {
+            .container {
+                padding: 30px;
+                margin: 20px;
+            }
+            h1 {
+                font-size: 2.2em;
+            }
+            .slogan {
+                font-size: 1em;
+            }
+            .buttons-container {
+                flex-direction: column;
+                gap: 18px;
+            }
+            .button {
+                font-size: 1.1em;
+                padding: 16px 30px;
+                clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+            }
+        }
+        @media (max-width: 400px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            .slogan {
+                font-size: 0.9em;
+            }
+            .button {
+                font-size: 1em;
+                padding: 14px 25px;
+                clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+
+    <div class="container">
+        <h1>Добро пожаловать на главную страницу!</h1>
+        <p class="slogan">Ваш путеводитель по миру авиации и аэропортов</p>
+        <div class="buttons-container">
+            <button class="button" onclick="handleButtonClick(event, 'planes')"><i class="fas fa-plane"></i> Список самолетов</button>
+            <button class="button" onclick="handleButtonClick(event, 'airports')"><i class="fas fa-building"></i> Список аэропортов</button>
+            <button class="button" onclick="handleButtonClick(event, 'map')"><i class="fas fa-map-marked-alt"></i> Карта</button>
+        </div>
+    </div>
+
+    <script>
+   
+        function createRipple(event) {
+            const button = event.currentTarget;
+            const circle = document.createElement('span');
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+
+
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+            circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+            circle.classList.add('ripple');
+
+            const oldRipple = button.querySelector('.ripple');
+            if (oldRipple) {
+                oldRipple.remove();
+            }
+
+            button.appendChild(circle);
+
+
+            circle.addEventListener('animationend', () => {
+                circle.remove();
+            });
+        }
+
+        function handleButtonClick(event, type) {
+            createRipple(event);
+
+            let message = '';
+            switch (type) {
+                case 'planes':
+                    message = 'Вы выбрали "Список самолетов"!';
+                    // window.location.href = '/planes.html'; // Раскомментируйте, когда страницы будут готовы
+                    break;
+                case 'airports':
+                    message = 'Вы выбрали "Список аэропортов"!';
+                    // window.location.href = '/airports.html'; // Раскомментируйте, когда страницы будут готовы
+                    break;
+                case 'map':
+                    message = 'Вы выбрали "Карта"!';
+                    // window.location.href = '/map.html'; // Раскомментируйте, когда страницы будут готовы
+                    break;
+                default:
+                    message = 'Кнопка нажата!';
+            }
+            alert(message);
+        }
+    </script>
+</body>
+</html>
