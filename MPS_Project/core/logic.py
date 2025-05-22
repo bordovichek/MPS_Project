@@ -4,8 +4,9 @@ import math
 import json
 
 from core.models_dir import Airplane
-from models_dir.Airport import get_all_airports
 import heapq
+
+from core.models_dir.Airport import get_all_airports
 
 EARTH_RAD = 6378
 KEROSINE_PRICE = 0.698
