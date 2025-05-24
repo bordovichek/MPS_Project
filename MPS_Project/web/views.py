@@ -10,3 +10,13 @@ def flight_view(request):
         "airports": airports,
         "aircrafts": aircrafts,
     })
+
+
+def airplane_list_view(request):
+    airplanes = Airplane.objects.all()
+    return render(request, 'web/list_airplanes.html', {'airplanes': airplanes})
+
+
+def airport_list_view(request):
+    airports = Airport.objects.all()
+    return render(request, 'web/list_airports.html', {'airports': airports})

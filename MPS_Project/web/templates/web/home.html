@@ -277,11 +277,11 @@
             switch (type) {
                 case 'planes':
                     message = 'Переход на страницу списка самолетов...';
-                    window.location.href = '/airplanes/';
+                    window.location.href = 'airplanes/';
                     break;
                 case 'airports':
                     message = 'Переход на страницу списка аэропортов...';
-                    window.location.href = '/airports/';
+                    window.location.href = 'airports/';
                     break;
                 case 'map':
                     message = 'Переход на страницу карты...';
@@ -290,8 +290,6 @@
                 default:
                     message = 'Кнопка нажата!';
             }
-            // Вы можете убрать alert, если хотите, чтобы переход происходил сразу
-            // alert(message);
         }
     </script>
 </body>

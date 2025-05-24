@@ -686,7 +686,7 @@
          */
         async function buildRoute() {
             clearPolylines();
-            clearMarkers(); // Очищаем маркеры перед новым построением
+            clearMarkers();
             hideRouteDetailsAndErrors();
 
             let selectedAirportIATAs = [];
@@ -728,7 +728,7 @@
             let totalFlights = 0;
             let overallMaxSegmentDistance = 0;
             let allSegmentsFound = true;
-            let allIntermediateAirports = new Set(); // Для хранения всех промежуточных аэропортов
+            let allIntermediateAirports = new Set();
 
             for (let i = 0; i < selectedAirportIATAs.length - 1; i++) {
                 const startIATA = selectedAirportIATAs[i];
@@ -738,8 +738,37 @@
 
                 if (routeSegmentResult && routeSegmentResult.routes.length > 0) {
                     routeSegmentResult.routes.forEach(segment => {
-                        const polyline = L.polyline(segment.inbetween, { color: 'blue', weight: 3, opacity: 0.7 }).addTo(map);
-                        polylines.push(polyline);
+                        let currentPolylinePoints = [];
+                        if (segment.inbetween.length > 0) {
+                            currentPolylinePoints.push(segment.inbetween[0]);
+                        }
+
+                        for (let k = 1; k < segment.inbetween.length; k++) {
+                            const prevPoint = segment.inbetween[k-1];
+                            const currentPoint = segment.inbetween[k];
+                            const prevLong = prevPoint[1];
+                            const currentLong = currentPoint[1];
+
+                            const diffLong = currentLong - prevLong;
+
+                            // Check for anti-meridian crossing. If the absolute difference in longitude is > 180, it means it crosses the antimeridian.
+                            if (Math.abs(diffLong) > 180) {
+                                // End the current polyline segment
+                                if (currentPolylinePoints.length > 1) {
+                                    const polyline = L.polyline(currentPolylinePoints, { color: 'blue', weight: 3, opacity: 0.7 }).addTo(map);
+                                    polylines.push(polyline);
+                                }
+                                // Start a new polyline segment from the current point
+                                currentPolylinePoints = [currentPoint];
+                            } else {
+                                currentPolylinePoints.push(currentPoint);
+                            }
+                        }
+                        // Add the last polyline segment (or the only one if no crossing occurred)
+                        if (currentPolylinePoints.length > 1) {
+                            const polyline = L.polyline(currentPolylinePoints, { color: 'blue', weight: 3, opacity: 0.7 }).addTo(map);
+                            polylines.push(polyline);
+                        }
                     });
                     totalWholeDistance += routeSegmentResult.whole_distance;
                     totalFlights += routeSegmentResult.routes.length;
@@ -760,6 +789,11 @@
                     }
                     allSegmentsFound = false;
                 }
+            }
+
+            if (!allSegmentsFound) {
+                showErrorMessage("Не удалось найти оптимальный маршрут для некоторых сегментов. Эти участки показаны прямой красной линией.");
+                return;
             }
 
             // Добавляем маркеры для выбранных аэропортов (с номерами)
@@ -804,11 +838,6 @@
                 map.fitBounds(group.getBounds().pad(0.5));
             }
 
-
-            if (!allSegmentsFound) {
-                showErrorMessage("Не удалось найти оптимальный маршрут для некоторых сегментов. Эти участки показаны прямой красной линией.");
-                return;
-            }
 
             // Расчет времени и стоимости
             let estimatedTime = 0;
