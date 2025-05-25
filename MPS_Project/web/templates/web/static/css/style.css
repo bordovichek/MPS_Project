@@ -1,0 +1,219 @@
+body {
+    background: #fff5e1;
+    font-family: 'Inter', sans-serif;
+    /* Tailwind CSS @apply директивы не работают напрямую в обычных CSS файлах,
+       они обрабатываются PostCSS/Tailwind CLI.
+       Если вы используете Tailwind CSS из CDN, то @apply здесь не будет работать.
+       В таком случае, нужно переписать эти стили обычным CSS.
+       Я переписал их, исходя из того, что CDN Tailwind не обрабатывает @apply в отдельных CSS файлах.
+    */
+    padding: 1rem; /* p-4 */
+    min-height: 100vh;
+}
+#map {
+    height: 600px;
+    width: 100%;
+    border-radius: 10px;
+    /* shadow-lg */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    margin-top: 20px;
+}
+.form-area {
+    /* mb-5 flex flex-wrap gap-5 justify-center */
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    justify-content: center;
+}
+.select-group {
+    /* flex flex-col */
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    min-width: 200px;
+    position: relative;
+}
+select, input[type="text"] {
+    /* p-2 my-2 block rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 */
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    border-radius: 0.375rem;
+    border: 1px solid #d1d5db;
+    width: 200px; /* Убедитесь, что ширина соответствует */
+    /* Tailwind focus styles for ring and border are harder to replicate with plain CSS without a builder */
+    /* For now, I'll omit them or use basic focus styles */
+}
+select:focus, input[type="text"]:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    --tw-ring-inset: var(--tw-empty,/*!*/ /*!*/);
+    --tw-ring-offset-width: 0px;
+    --tw-ring-offset-color: #fff;
+    --tw-ring-color: #3b82f6; /* blue-500 */
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+    border-color: #3b82f6; /* blue-500 */
+}
+
+
+.add-airport-btn, .build-route-btn {
+    /* text-white py-2 px-4 rounded-md cursor-pointer text-base mt-2 shadow-md transition-all duration-300 ease-in-out */
+    color: #fff;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition-property: all;
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.add-airport-btn {
+    /* bg-green-500 hover:bg-green-600 */
+    background-color: #22c55e;
+    align-self: flex-start;
+    margin-top: 28px;
+    height: 42px;
+}
+.add-airport-btn:hover {
+    background-color: #16a34a;
+}
+.build-route-btn {
+    /* bg-blue-500 hover:bg-blue-600 ml-5 */
+    background-color: #3b82f6;
+    margin-left: 1.25rem;
+    align-self: flex-start;
+    margin-top: 28px;
+    height: 42px;
+}
+.build-route-btn:hover {
+    background-color: #2563eb;
+}
+
+/* Кнопка удаления для select-group */
+.remove-airport-btn {
+    /* absolute top-0 right-0 bg-red-500 text-white rounded-full h-6 w-6 flex items-center justify-center text-xs font-bold cursor-pointer hover:bg-red-600 */
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #ef4444;
+    color: #fff;
+    border-radius: 9999px;
+    height: 1.5rem;
+    width: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transform: translate(50%, -50%);
+    z-index: 10;
+}
+.remove-airport-btn:hover {
+    background-color: #dc2626;
+}
+
+/* Для нумерованного маркера */
+.numbered-marker-icon {
+    position: relative;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.numbered-marker-icon .marker-number {
+    position: absolute;
+    top: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: blue;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    font-size: 10px;
+    font-weight: bold;
+    z-index: 2;
+}
+
+.numbered-marker-icon .marker-iata-code {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    font-weight: bold;
+    color: black;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 1px 3px;
+    border-radius: 2px;
+    z-index: 1;
+}
+
+/* Для промежуточного маркера */
+.intermediate-marker-icon {
+    position: relative;
+    text-align: center;
+    white-space: nowrap;
+    background-color: blue;
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+    border: 1px solid white;
+    box-sizing: border-box;
+}
+
+.intermediate-marker-icon .marker-iata-code {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    font-weight: bold;
+    color: black;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 1px 3px;
+    border-radius: 2px;
+    line-height: normal;
+}
+
+#routeDetails {
+    /* mt-8 p-6 bg-white rounded-lg shadow-lg */
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+#routeDetails h3 {
+    /* text-xl font-semibold mb-4 text-gray-800 */
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #2d3748;
+}
+#routeDetails p {
+    /* text-gray-700 mb-2 */
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+}
+#routeDetails p strong {
+    /* text-gray-900 */
+    color: #1a202c;
+}
+.error-message {
+    /* text-red-600 font-bold mt-4 */
+    color: #dc2626;
+    font-weight: 700;
+    margin-top: 1rem;
+}
