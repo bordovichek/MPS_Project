@@ -5,10 +5,9 @@ from math import radians, sin, cos, sqrt, asin, acos, atan2, ceil, pi
 from core.models_dir import Airport, Airplane
 
 EARTH_RAD = 6378
-KEROSINE_PRICE = 0.698  # Цена керосина за кг (пример)
+KEROSINE_PRICE = 0.698
 
 
-# --- ИСКЛЮЧЕНИЯ ---
 class NoRouteException(Exception):
     def __init__(self, message="No Route Found"):
         super().__init__(message)

@@ -37,6 +37,7 @@
         .add-airport-btn, .build-route-btn {
             @apply text-white py-2 px-4 rounded-md cursor-pointer text-base mt-2 shadow-md transition-all duration-300 ease-in-out;
         }
+
         .add-airport-btn {
             @apply bg-green-500 hover:bg-green-600;
             align-self: flex-start;
@@ -56,30 +57,69 @@
             transform: translate(50%, -50%); /* Смещаем кнопку, чтобы она была над углом */
             z-index: 10; /* Убедимся, что кнопка поверх других элементов */
         }
-        /* Стили для нумерованных маркеров */
-        .numbered-marker-icon {
-            background-color: #ef4444; /* red-500 */
-            border-radius: 50%;
-            color: white;
-            text-align: center;
-            line-height: 25px; /* Высота линии должна соответствовать iconSize[1] */
-            font-weight: bold;
-            font-size: 14px;
-            border: 2px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        /* Стили для промежуточных маркеров */
-        .intermediate-marker-icon {
-            background-color: #3b82f6; /* blue-500 */
-            border-radius: 50%;
-            color: white; /* Цвет текста, если он вдруг понадобится, но HTML пустой */
-            text-align: center;
-            line-height: 15px; /* Соответствует iconSize[1] */
-            font-weight: bold;
-            font-size: 10px; /* Меньший размер шрифта */
-            border: 2px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
+        /* Для нумерованного маркера */
+.numbered-marker-icon {
+    position: relative;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.numbered-marker-icon .marker-number {
+    position: absolute;
+    top: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: blue;
+    color: white;
+    border-radius: 50%;
+    width: 18px;   /* Уменьшаем размер круга */
+    height: 18px;  /* Уменьшаем размер круга */
+    line-height: 18px; /* Соответствует высоте для центрирования текста */
+    font-size: 10px; /* Уменьшаем размер шрифта */
+    font-weight: bold;
+    z-index: 2;
+}
+
+.numbered-marker-icon .marker-iata-code {
+    position: absolute;
+    bottom: -10px; /* Немного ближе к точке */
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px; /* Ещё меньше шрифт для IATA */
+    font-weight: bold;
+    color: black;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 1px 3px; /* Меньший padding */
+    border-radius: 2px; /* Меньший border-radius */
+    z-index: 1;
+}
+
+/* Для промежуточного маркера */
+.intermediate-marker-icon {
+    position: relative;
+    text-align: center;
+    white-space: nowrap;
+    background-color: blue;
+    border-radius: 50%;
+    width: 10px;   /* Уменьшаем размер точки */
+    height: 10px;  /* Уменьшаем размер точки */
+    border: 1px solid white; /* Более тонкая обводка */
+    box-sizing: border-box;
+}
+
+.intermediate-marker-icon .marker-iata-code {
+    position: absolute;
+    bottom: -20px; /* Скорректированное положение */
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px; /* Меньший размер шрифта */
+    font-weight: bold;
+    color: black;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 1px 3px; /* Меньший padding */
+    border-radius: 2px;
+    line-height: normal;
+}
 
         #routeDetails {
             @apply mt-8 p-6 bg-white rounded-lg shadow-lg;
@@ -671,41 +711,41 @@
 
                     // --- Отрисовка маркеров для начального/конечного/промежуточных аэропортов ---
                     const routeAirports = data.all_path_airports_iatas;
-                    console.log("Отрисовка маркеров для аэропортов маршрута:", routeAirports);
+console.log("Отрисовка маркеров для аэропортов маршрута:", routeAirports);
 
-                    routeAirports.forEach(iata => {
-                        const airportData = airportsByCode[iata];
-                        if (airportData) {
-                            // Проверяем, является ли аэропорт начальным/конечным выбранным пользователем
-                            const isSelectedStartOrEnd = selectedAirportIATAs.includes(iata);
-                            let markerIcon;
+routeAirports.forEach(iata => {
+    const airportData = airportsByCode[iata];
+    if (airportData) {
+        const isSelectedStartOrEnd = selectedAirportIATAs.includes(iata);
+        let markerIcon;
 
-                            if (isSelectedStartOrEnd) {
-                                // Если это один из выбранных пользователем аэропортов, используем нумерованный маркер
-                                const index = selectedAirportIATAs.indexOf(iata);
-                                markerIcon = L.divIcon({
-                                    className: 'numbered-marker-icon',
-                                    html: `<div class="marker-number">${index + 1}</div>`,
-                                    iconSize: [25, 25],
-                                    iconAnchor: [12, 25]
-                                });
-                            } else {
-                                // Это промежуточная остановка (не выбранная пользователем напрямую)
-                                markerIcon = L.divIcon({
-                                    className: 'intermediate-marker-icon',
-                                    html: '', // Для промежуточных маркеров html может быть пустым, если нужна просто точка
-                                    iconSize: [15, 15],
-                                    iconAnchor: [7, 7]
-                                });
-                            }
+        // Определяем базовый HTML для IATA-кода, который будет общим
+        const iataHtml = `<div class="marker-iata-code">${iata}</div>`;
 
-                            const m = L.marker([airportData.latitude, airportData.longitude], { icon: markerIcon }).addTo(routeMarkerLayerGroup);
-                            m.bindPopup(`<b>${airportData.name}</b> (${airportData.iata_code})`);
-                            console.log(`  Добавлен маркер для ${airportData.name} (${iata})`);
-                        } else {
-                            console.error(`  Ошибка: Аэропорт с IATA-кодом ${iata} не найден в allAirportsData.`);
-                        }
-                    });
+        if (isSelectedStartOrEnd) {
+            const index = selectedAirportIATAs.indexOf(iata);
+            markerIcon = L.divIcon({
+                className: 'numbered-marker-icon',
+                html: `<div class="marker-number">${index + 1}</div>${iataHtml}`,
+                iconSize: [30, 30], // Уменьшаем размер иконки в JS
+                iconAnchor: [15, 30] // Соответственно корректируем якорь (центр внизу маркера)
+            });
+        } else {
+            markerIcon = L.divIcon({
+                className: 'intermediate-marker-icon',
+                html: iataHtml,
+                iconSize: [25, 25], // Уменьшаем размер иконки в JS
+                iconAnchor: [12, 25] // Соответственно корректируем якорь
+            });
+        }
+
+        const m = L.marker([airportData.latitude, airportData.longitude], { icon: markerIcon }).addTo(routeMarkerLayerGroup);
+        m.bindPopup(`<b>${airportData.name}</b> (${airportData.iata_code})`);
+        console.log(`  Добавлен маркер для ${airportData.name} (${iata})`);
+    } else {
+        console.error(`  Ошибка: Аэропорт с IATA-кодом ${iata} не найден в allAirportsData.`);
+    }
+});
 
                     // --- Обновление информации о маршруте в UI ---
                     document.getElementById('detailPlaneName').textContent = data.plane || 'Не выбран';
