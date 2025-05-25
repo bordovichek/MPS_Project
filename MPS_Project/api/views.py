@@ -5,7 +5,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from rest_framework import generics
 
-from core.logic import dijkstra
 from core.mixins import CaseInsensitiveLookupMixin
 from core.models_dir import Airplane, Airport
 from .serializers import AirplaneSerializer, AirportSerializer
