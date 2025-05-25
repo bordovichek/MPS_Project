@@ -13,7 +13,10 @@ def flight_view(request):
 
 
 def airplane_list_view(request):
+    name_query = request.GET.get('name')
     airplanes = Airplane.objects.all()
+    if name_query:
+        airplanes = airplanes.filter(name__icontains=name_query)
     return render(request, 'web/list_airplanes.html', {'airplanes': airplanes})
 
 

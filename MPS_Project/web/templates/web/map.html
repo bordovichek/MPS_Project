@@ -131,14 +131,21 @@
 
         <div class="select-group">
             <label for="aircraft" class="font-medium text-gray-700">Выберите самолет:</label>
-            <select id="aircraft">
-                <option value="">--</option>
-                {% for a in aircrafts %}
-                    <option value="{{ a.name }}" data-max-distance="{{ a.max_distance }}" data-cruise-speed="{{ a.cruise_speed }}" data-consumption="{{ a.consumption }}">
-                        {{ a.name }}
-                    </option>
-                {% endfor %}
-            </select>
+           <select id="aircraft">
+    <option value="">--</option>
+    {% for a in aircrafts %}
+        <option value="{{ a.name }}"
+                data-max-distance="{{ a.max_distance }}"
+                data-cruise-speed="{{ a.cruise_speed }}"
+                data-consumption="{{ a.consumption }}"
+                data-in-service="{{ a.in_service|yesno:'true,false' }}">
+            {{ a.name }}
+        </option>
+    {% endfor %}
+</select>
+            <div id="retiredAircraftNotice" class="hidden mt-6 bg-yellow-200 border-l-4 border-yellow-600 text-yellow-800 p-4 rounded shadow">
+    <strong>Внимание:</strong> самолёт <strong id="retiredAircraftName"></strong> выведен из эксплуатации и включён в список исключительно для демонстрации своих характеристик.
+</div>
         </div>
         <button type="button" id="buildRouteBtn" class="build-route-btn" disabled>Построить маршрут</button>
     </div>
@@ -159,6 +166,24 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+    const aircraftSelect = document.getElementById("aircraft");
+    const retiredNotice = document.getElementById("retiredAircraftNotice");
+    const retiredNameSpan = document.getElementById("retiredAircraftName");
+
+    aircraftSelect.addEventListener("change", function() {
+        const selectedOption = aircraftSelect.options[aircraftSelect.selectedIndex];
+        const inService = selectedOption.getAttribute("data-in-service");
+        const aircraftName = selectedOption.textContent.trim();
+
+        if (inService === "false") {
+            retiredNameSpan.textContent = aircraftName;
+            retiredNotice.classList.remove("hidden");
+        } else {
+            retiredNotice.classList.add("hidden");
+        }
+    });
+});
         const map = L.map('map').setView([20, 0], 2);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
