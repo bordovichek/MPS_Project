@@ -10,6 +10,9 @@ class Airplane(models.Model):
     consumption = models.PositiveIntegerField("Расход топлива (кг/час)", default=8000)
     cruise_speed = models.PositiveIntegerField("Крейсерская скорость (км/час)", default=1000)
     max_distance = models.PositiveIntegerField("Максимальное расстояние (км)", default=6000)
+    in_service = models.BooleanField("В эксплуатации", default=True)
+    description = models.CharField("Описание", max_length=500, default="")
+    image = models.ImageField("Фото самолета", upload_to='media_plane_photo/', null=True, blank=True)
 
     def __str__(self):
         return (

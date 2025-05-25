@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список аэропортов</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .airport {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .airport h2 {
+            margin: 0;
+            font-size: 22px;
+            color: #006633;
+        }
+        .airport p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Список аэропортов</h1>
+    {% for airplane in airplanes %}
+    <div class="airplane">
+        <h2>{{ airplane.name }}</h2>
+        {% if airplane.description %}
+            <p>{{ airplane.description }}</p>
+        {% endif %}
+        {% if airplane.image %}
+            <img src="{{ airplane.image.url }}" alt="Фото {{ airplane.name }}" style="max-width:100%; height:auto;">
+        {% endif %}
+    </div>
+{% endfor %}
+</body>
+</html>
