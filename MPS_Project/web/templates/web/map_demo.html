@@ -1,0 +1,539 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>MPS Project</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        /* Общие стили для всех элементов, чтобы padding и border включались в ширину/высоту */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        /* Стили для body: голубой градиент и анимация */
+        body {
+            font-family: 'Inter', sans-serif; /* Основной шрифт */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Центрирование по горизонтали */
+            justify-content: flex-start; /* Выравнивание по верху */
+            min-height: 100vh;
+            margin: 0;
+            padding-top: 20px; /* Отступ сверху */
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%); /* Голубой градиент */
+            color: #333;
+            text-align: center;
+            overflow-x: hidden; /* Предотвращает горизонтальную прокрутку */
+            position: relative; /* Для позиционирования световых эффектов */
+
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite; /* Анимация градиента */
+        }
+
+        /* Анимация градиентного фона */
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Световые эффекты/блики на фоне */
+        .light-effect {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none; /* Игнорировать события мыши */
+            z-index: 0; /* Под контейнером */
+        }
+
+        /* Разные настройки для каждого светового эффекта */
+        .light-effect:nth-child(1) {
+            top: -50px;
+            left: -50px;
+            animation: lightMove 20s linear infinite alternate;
+        }
+
+        .light-effect:nth-child(2) {
+            top: auto;
+            bottom: -50px;
+            left: auto;
+            right: -50px;
+            width: 180px;
+            height: 180px;
+            animation: lightMove 25s linear infinite alternate-reverse;
+        }
+
+        .light-effect:nth-child(3) {
+            top: 20%;
+            left: 80%;
+            width: 150px;
+            height: 150px;
+            animation: lightMove 18s ease-in-out infinite alternate-reverse;
+            animation-delay: 2s;
+        }
+
+        .light-effect:nth-child(4) {
+            bottom: 10%;
+            left: 10%;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 70%);
+            animation: lightMove 22s linear infinite alternate;
+            animation-delay: 4s;
+        }
+
+        /* Анимация движения световых эффектов */
+        @keyframes lightMove {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            25% { transform: translate(calc(100vw - 100px), calc(100vh - 100px)) scale(1.1); opacity: 0.6; }
+            50% { transform: translate(calc(100vw / 2), 0) scale(0.9); opacity: 0.4; }
+            75% { transform: translate(0, calc(100vh - 100px)) scale(1.2); opacity: 0.7; }
+            100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+        }
+
+        /* Основной контейнер для формы и деталей маршрута */
+        .main-content-container {
+            background-color: rgba(255, 255, 255, 0.92);
+            padding: 30px; /* Вертикальный padding для компактности */
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2), 0 5px 10px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+            animation: fadeIn 1s ease-out;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 20px;
+            width: calc(100% - 60px); /* Полная ширина с отступами */
+            max-width: none;
+            box-sizing: border-box;
+        }
+
+        .main-content-container:hover {
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Стиль для заголовка h2 */
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5em; /* Немного уменьшаем размер шрифта */
+            color: #1f4e79;
+            margin-bottom: 10px; /* Уменьшаем отступ */
+            animation: slideInDown 0.8s ease-out;
+        }
+
+        /* Стиль для слогана */
+        .slogan {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1em; /* Немного уменьшаем размер шрифта */
+            color: #555;
+            margin-bottom: 25px; /* Уменьшаем отступ */
+            animation: fadeIn 1s ease-out 0.3s backwards;
+        }
+
+        /* Стили для групп выбора */
+        .form-area {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 15px; /* Уменьшаем отступ между элементами */
+            margin-top: 15px; /* Уменьшаем отступ */
+        }
+
+        .select-group {
+            flex: 1 1 calc(50% - 7.5px); /* Адаптируем ширину под новый gap */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px; /* Уменьшаем отступ внутри группы */
+            margin-bottom: 0;
+        }
+
+        .select-group:last-of-type {
+            flex: 1 1 100%;
+        }
+
+        .select-group label {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            color: #1f4e79;
+            font-size: 1em; /* Немного уменьшаем размер шрифта */
+        }
+
+        /* Стили для полей ввода и выпадающих списков */
+        .select-group select,
+        .select-group input[type="text"] {
+            width: 100%;
+            padding: 8px 12px; /* Уменьшаем padding */
+            border: 2px solid #a7d9ff;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95em; /* Немного уменьшаем размер шрифта */
+            color: #333;
+            background-color: #f8faff;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .select-group select:focus,
+        .select-group input[type="text"]:focus {
+            outline: none;
+            border-color: #1E90FF;
+            box-shadow: 0 0 0 4px rgba(30, 144, 255, 0.3), inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Стили для кнопок "+" и "Построить маршрут" */
+        .add-airport-btn,
+        .build-route-btn {
+            background-color: #1E90FF;
+            color: white;
+            border: none;
+            padding: 12px 25px; /* Уменьшаем padding */
+            text-align: center;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em; /* Немного уменьшаем размер шрифта */
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 87, 184, 0.3);
+            clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px), 0 15px);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            margin-top: 10px; /* Уменьшаем отступ */
+        }
+
+        /* Более сложная анимация кнопок при наведении (3D-наклон) */
+        .add-airport-btn:hover,
+        .build-route-btn:hover {
+            background-color: #1C7ED6;
+            transform: translateY(-3px) scale(1.02) perspective(1000px) rotateX(2deg); /* Немного уменьшаем эффект */
+            box-shadow: 0 7px 18px rgba(0, 87, 184, 0.4);
+        }
+
+        .add-airport-btn:active,
+        .build-route-btn:active {
+            transform: translateY(-1px) scale(1.005);
+            background-color: #1A75C4;
+        }
+
+        .build-route-btn:disabled {
+            background-color: #a7d9ff;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Стиль для иконок внутри кнопок */
+        .add-airport-btn i,
+        .build-route-btn i {
+            margin-right: 6px; /* Уменьшаем отступ */
+            font-size: 0.9em; /* Немного уменьшаем размер иконки */
+        }
+
+        /* Стиль для эффекта ряби */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            z-index: 0;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Стили для карты */
+        #map {
+            height: 500px;
+            width: calc(100% - 60px);
+            max-width: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            margin-top: 20px;
+            z-index: 1;
+        }
+
+        /* Стили для деталей маршрута */
+        #routeDetails {
+            background-color: rgba(255, 255, 255, 0.92);
+            padding: 20px; /* Уменьшаем padding */
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            width: calc(100% - 60px);
+            max-width: none;
+            text-align: left;
+            box-sizing: border-box;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+        }
+        #routeDetails.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        #routeDetails h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.6em; /* Немного уменьшаем размер шрифта */
+            color: #1f4e79;
+            margin-top: 0;
+            margin-bottom: 10px; /* Уменьшаем отступ */
+            text-align: center;
+        }
+
+        #routeDetails p {
+            font-family: 'Inter', sans-serif;
+            font-size: 1em; /* Немного уменьшаем размер шрифта */
+            line-height: 1.5; /* Немного уменьшаем межстрочный интервал */
+            color: #333;
+            margin-bottom: 6px; /* Уменьшаем отступ */
+        }
+
+        #routeDetails strong {
+            color: #1E90FF;
+        }
+
+        /* Стили для уведомления о выведенном из эксплуатации самолете */
+        #retiredAircraftNotice {
+            margin-top: 10px; /* Уменьшаем отступ */
+            padding: 12px; /* Уменьшаем padding */
+            border-radius: 8px;
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            color: #664d03;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em; /* Немного уменьшаем размер шрифта */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+        }
+        #retiredAircraftNotice.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* Стили для сообщения об ошибке */
+        #errorMessage {
+            background-color: #f8d7da;
+            border-left: 5px solid #dc3545;
+            color: #721c24;
+            padding: 12px; /* Уменьшаем padding */
+            border-radius: 8px;
+            margin-top: 15px; /* Уменьшаем отступ */
+            text-align: left;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95em; /* Немного уменьшаем размер шрифта */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-sizing: border-box;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+        }
+        #errorMessage.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* Анимации появления элементов */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideInDown {
+            from { transform: translateY(-60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Медиа-запросы для адаптивности */
+        @media (max-width: 768px) {
+            .main-content-container, #map, #routeDetails, #errorMessage {
+                width: calc(100% - 30px); /* Уменьшаем отступы по бокам для мобильных */
+                padding: 15px; /* Уменьшаем padding */
+            }
+            h2 {
+                font-size: 2.2em;
+            }
+            .slogan {
+                font-size: 1.1em;
+            }
+            .select-group {
+                flex: 1 1 100%;
+            }
+            .add-airport-btn, .build-route-btn {
+                padding: 10px 20px;
+                font-size: 0.95em;
+            }
+            #map {
+                height: 350px; /* Немного уменьшаем высоту карты */
+            }
+        }
+
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 1.6em;
+            }
+            .slogan {
+                font-size: 0.9em;
+            }
+            .select-group label {
+                font-size: 0.9em;
+            }
+            .select-group select,
+            .select-group input[type="text"] {
+                padding: 6px 10px;
+                font-size: 0.85em;
+            }
+            .add-airport-btn, .build-route-btn {
+                padding: 8px 15px;
+                font-size: 0.85em;
+            }
+            #map {
+                height: 250px;
+            }
+            #routeDetails, #errorMessage {
+                padding: 10px;
+                font-size: 0.85em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+
+    <div class="main-content-container">
+        <h2 class="text-2xl font-bold mb-4 text-center">MPS Project</h2>
+        <p class="slogan">Постройте оптимальный маршрут для вашего самолета</p>
+
+        <div class="form-area" id="airportSelectionArea">
+            <div class="select-group">
+                <label for="airport1" class="font-medium text-gray-700">Выберите аэропорт 1:</label>
+                <select id="airport1">
+                    <option value="">--</option>
+                    {# Опции будут заполнены через JS после загрузки initial_data #}
+                </select>
+                <input type="text" id="searchAirport1" placeholder="Поиск Аэропорта 1 (имя/IATA/страна)">
+            </div>
+
+            <div class="select-group">
+                <label for="airport2" class="font-medium text-gray-700">Выберите аэропорт 2:</label>
+                <select id="airport2" disabled>
+                    <option value="">--</option>
+                    {# Опции будут заполнены через JS после загрузки initial_data #}
+                </select>
+                <input type="text" id="searchAirport2" placeholder="Поиск Аэропорта 2 (имя/IATA/страна)">
+            </div>
+
+            <button type="button" id="addAirportBtn" class="add-airport-btn">+</button>
+
+            <div class="select-group">
+                <label for="aircraft" class="font-medium text-gray-700">Выберите самолет:</label>
+               <select id="aircraft">
+                    <option value="">--</option>
+                    {# Опции будут заполнены через JS после загрузки initial_data #}
+                </select>
+                <div id="retiredAircraftNotice" class="hidden mt-6 bg-yellow-200 border-l-4 border-yellow-600 text-yellow-800 p-4 rounded shadow">
+                    <strong>Внимание:</strong> самолёт <strong id="retiredAircraftName"></strong> выведен из эксплуатации и включён в список исключительно для демонстрации своих характеристик.
+                </div>
+            </div>
+            <button type="button" id="buildRouteBtn" class="build-route-btn" disabled>Построить маршрут</button>
+        </div>
+
+        <div id="map"></div>
+
+        <div id="routeDetails" class="hidden">
+            <h3>Информация о маршруте:</h3>
+            <p>Самолет: <strong id="detailPlaneName"></strong></p>
+            <p>Общая дистанция: <strong id="detailWholeDistance"></strong> км</p>
+            <p>Количество перелетов: <strong id="detailFlights"></strong></p>
+            <p>Максимальное расстояние одного перелета: <strong id="detailMaxSegmentDistance"></strong> км</p>
+            <p>Примерное время в пути: <strong id="detailTime"></strong> часов</p>
+            <p>Примерная стоимость топлива: <strong id="detailCost"></strong> $</p>
+        </div>
+        <div id="errorMessage" class="error-message hidden"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{% static 'js/script.js' %}"></script> {# Здесь будет ваш JS код #}
+
+    <script>
+        // Функция для создания эффекта ряби на кнопках
+        function createRipple(event) {
+            const button = event.currentTarget;
+            const circle = document.createElement('span');
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+            circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+            circle.classList.add('ripple');
+
+            const oldRipple = button.querySelector('.ripple');
+            if (oldRipple) {
+                oldRipple.remove();
+            }
+
+            button.appendChild(circle);
+
+            circle.addEventListener('animationend', () => {
+                circle.remove();
+            });
+        }
+
+        // Функции для управления видимостью блоков с плавными переходами
+        // Вам нужно будет вызывать эти функции из вашего script.js
+        function showBlock(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.classList.add('show');
+            }
+        }
+
+        function hideBlock(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.classList.remove('show');
+            }
+        }
+
+        // Применяем эффект ряби ко всем кнопкам
+        document.addEventListener('DOMContentLoaded', () => {
+            const buttons = document.querySelectorAll('.add-airport-btn, .build-route-btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', createRipple);
+            });
+        });
+    </script>
+</body>
+</html>
