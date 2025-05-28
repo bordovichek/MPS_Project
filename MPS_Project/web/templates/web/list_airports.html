@@ -29,14 +29,11 @@
 </head>
 <body>
     <h1>Список аэропортов</h1>
-    {% for airplane in airplanes %}
+    {% for airport in airports %}
     <div class="airplane">
-        <h2>{{ airplane.name }}</h2>
-        {% if airplane.description %}
+        <h2>{{ airport.name }}</h2>
+        {% if airport.description %}
             <p>{{ airplane.description }}</p>
-        {% endif %}
-        {% if airplane.image %}
-            <img src="{{ airplane.image.url }}" alt="Фото {{ airplane.name }}" style="max-width:100%; height:auto;">
         {% endif %}
     </div>
 {% endfor %}
