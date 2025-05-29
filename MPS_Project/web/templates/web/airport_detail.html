@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Детали аэропорта: {{ airport.name }}</title>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/list_airports.css' %}"> {# Можно использовать те же стили или создать новые #}
+    <style>
+        .map-link {
+            color: var(--button-bg);
+            text-decoration: none;
+            transition: color 0.2s ease, text-decoration 0.2s ease;
+            white-space: nowrap;
+        }
+        .map-link:hover {
+            color: var(--button-hover-bg);
+            text-decoration: underline;
+        }
+        .map-link i {
+            margin-left: 5px;
+        }
+        /* Убедитесь, что page-container имеет текст, выравненный по левому краю для детальных страниц */
+        .page-container {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+
+    <div class="page-container">
+        <button id="homeBtn" class="home-btn" onclick="window.location.href='{% url 'airport_list' %}'">
+            <i class="fas fa-arrow-left"></i> Назад к списку
+        </button>
+
+        <button id="themeToggleBtn" class="theme-toggle-btn">
+            <i class="fas fa-moon"></i>
+        </button>
+
+        <div class="header">
+            <h1>{{ airport.name }} {% if airport.iata_code %}({{ airport.iata_code }}){% endif %}</h1>
+        </div>
+
+        <p><strong>Страна:</strong> {{ airport.country }}</p>
+        <p>
+            <strong>Координаты:</strong>
+            {# Ссылка на Google Maps #}
+            <a href="https://www.google.com/maps/search/?api=1&query={{ airport.latitude }},{{ airport.longitude }}"
+               target="_blank"
+               title="Открыть на Google Maps"
+               class="map-link">
+                Широта: {{ airport.latitude }}, Долгота: {{ airport.longitude }}
+                <i class="fas fa-map-marker-alt"></i> {# Иконка карты #}
+            </a>
+        </p>
+        <p><strong>IATA Код:</strong> {{ airport.iata_code }}</p>
+
+        {% if airport.description %}
+            <h2>Описание</h2>
+            <p>{{ airport.description }}</p>
+        {% endif %}
+
+        <hr>
+        <p><a href="{% url 'airport_list' %}" class="map-link">Вернуться к списку аэропортов</a></p>
+    </div>
+
+    {# Подключаем общий JS-файл для эффектов и переключения темы #}
+    {# Убедитесь, что list_airplanes.js находится в web/static/web/js/ #}
+    <script src="{% static 'web/js/list_airplanes.js' %}"></script>
+    <script>
+        // Специальная логика для этой страницы, если требуется, например, для homeBtn
+        document.addEventListener('DOMContentLoaded', () => {
+            const homeBtn = document.getElementById('homeBtn');
+            if (homeBtn) {
+                // Если homeBtn на этой странице должна вести назад к списку аэропортов
+                // (а не на главную, как в list_airplanes.js по умолчанию),
+                // то её onclick атрибут уже обрабатывает это.
+                // Просто убедимся, что эффект ряби тоже применяется.
+                homeBtn.addEventListener('click', (event) => {
+                    if (typeof createRipple === 'function') { // Проверяем, что функция определена
+                        createRipple(event);
+                    }
+                    // Переход происходит через onclick атрибут в HTML
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -615,16 +615,15 @@
     font-size: 0.95em;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 
-    /* Стили для скрытого состояния */
-    opacity: 0; /* Полностью невидимый */
-    height: 0; /* Не занимает место */
-    overflow: hidden; /* Обрезаем содержимое, чтобы не вылезало */
-    padding-top: 0; /* Убираем верхний внутренний отступ */
-    padding-bottom: 0; /* Убираем нижний внутренний отступ */
-    margin-top: 0; /* Убираем верхний внешний отступ */
-    pointer-events: none; /* Не реагирует на события мыши, когда скрыт */
 
-    /* Плавные переходы для анимации */
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    pointer-events: none;
+
     transition: opacity 0.5s ease,
                 height 0.5s ease,
                 padding 0.5s ease,
@@ -634,24 +633,22 @@
                 border-color 0.5s ease;
 }
 
-/* Стили для показанной плашки */
 #retiredAircraftNotice.show {
-    opacity: 1; /* Полностью видимый */
-    height: auto; /* Занимает естественную высоту */
-    padding-top: 12px; /* Возвращаем верхний внутренний отступ */
-    padding-bottom: 12px; /* Возвращаем нижний внутренний отступ */
-    margin-top: 10px; /* Возвращаем верхний внешний отступ */
-    pointer-events: auto; /* Реагирует на события мыши */
+    opacity: 1;
+    height: auto;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    margin-top: 10px;
+    pointer-events: auto;
 }
 
-/* Стили для темной темы */
+
 body.dark-theme #retiredAircraftNotice {
     background-color: #3b3b3b;
     border-left-color: #facc15;
     color: #facc15;
 }
 
-/* Если вы где-то ещё используете класс 'hidden' и хотите, чтобы он полностью скрывал элемент */
 .hidden {
     display: none !important;
 }
