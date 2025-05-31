@@ -329,6 +329,7 @@
             <button class="button" onclick="handleButtonClick(event, 'planes')"><i class="fas fa-plane"></i> Список самолетов</button>
             <button class="button" onclick="handleButtonClick(event, 'airports')"><i class="fas fa-building"></i> Список аэропортов</button>
             <button class="button" onclick="handleButtonClick(event, 'map')"><i class="fas fa-map-marked-alt"></i> Карта</button>
+             <button class="button" onclick="handleButtonClick(event, 'compare')"><i class="fas fa-balance-scale"></i> Сравнить самолеты</button>
         </div>
     </div>
 
@@ -373,6 +374,10 @@
                     message = 'Переход на страницу карты...';
                     window.location.href = '/map/';
                     break;
+                case 'compare': // НОВЫЙ КЕЙС ДЛЯ СРАВНЕНИЯ
+                    message = 'Переход на страницу сравнения самолетов...';
+                    window.location.href = '/compare/';
+                    break;
                 default:
                     message = 'Кнопка нажата!';
             }
@@ -407,11 +412,6 @@
                     localStorage.setItem('theme', 'light');
                 }
                 createRipple(event);
-            });
-
-            const navButtons = document.querySelectorAll('.buttons-container .button');
-            navButtons.forEach(button => {
-                button.addEventListener('click', (event) => handleButtonClick(event, button.dataset.type));
             });
         });
     </script>

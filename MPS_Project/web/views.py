@@ -58,10 +58,12 @@ def airport_list_view(request):
         'sort_by': sort_by,
     })
 
+
 class AirportDetailView(DetailView):
     model = Airport
     template_name = 'web/airport_detail.html'
     context_object_name = 'airport'
+
 
 class AirplaneDetailView(DetailView):
     model = Airplane
