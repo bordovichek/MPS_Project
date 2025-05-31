@@ -1,92 +1,519 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8">
-<title>Детали аэропорта: {{ airport.name }}</title>
-{% load static %}
-<link rel="stylesheet" href="{% static 'css/list_airports.css' %}"> {# Можно использовать те же стили или создать новые #}
-    <style>
-        .map-link {
-            color: var(--button-bg);
-            text-decoration: none;
-            transition: color 0.2s ease, text-decoration 0.2s ease;
-            white-space: nowrap;
-        }
-        .map-link:hover {
-            color: var(--button-hover-bg);
-            text-decoration: underline;
-        }
-        .map-link i {
-            margin-left: 5px;
-        }
-        /* Убедитесь, что page-container имеет текст, выравненный по левому краю для детальных страниц */
-        .page-container {
-            text-align: left;
-        }
-    </style>
-</head>
-<body>
-    <div class="light-effect"></div>
-    <div class="light-effect"></div>
-    <div class="light-effect"></div>
-    <div class="light-effect"></div>
+    {% load static %}
+    <!DOCTYPE html>
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <title>Детали аэропорта: {{ airport.name }}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@600&display=swap" rel="stylesheet">
+        <link rel="icon" href="https://placehold.co/32x32/007bff/ffffff?text=%E2%9C%88%EF%B8%8F" type="image/x-icon">
 
-    <div class="page-container">
-        <button id="homeBtn" class="home-btn" onclick="window.location.href='{% url 'airport_list' %}'">
-            <i class="fas fa-arrow-left"></i> Назад к списку
-        </button>
+        <style>
+            /* Общие стили для всех элементов, чтобы padding и border включались в ширину/высоту */
+            *, *::before, *::after {
+                box-sizing: border-box;
+            }
 
-        <button id="themeToggleBtn" class="theme-toggle-btn">
-            <i class="fas fa-moon"></i>
-        </button>
+            /* Определение CSS-переменных для светлой и темной темы */
+            :root {
+                --bg-gradient-start: #89f7fe;
+                --bg-gradient-end: #66a6ff;
+                --text-color: #333;
+                --heading-color: #1f4e79;
+                --container-bg: rgba(255, 255, 255, 0.92);
+                --container-shadow-1: rgba(0, 0, 0, 0.2);
+                --container-shadow-2: rgba(0, 0, 0, 0.1);
+                --button-bg: #1E90FF;
+                --button-hover-bg: #1C7ED6;
+                --button-active-bg: #1A75C4;
+                --button-shadow: rgba(0, 87, 184, 0.3);
+                --button-hover-shadow: rgba(0, 87, 184, 0.4);
+                --ripple-color: rgba(255, 255, 255, 0.7);
+                --light-effect-color-1: rgba(255, 255, 255, 0.4);
+                --light-effect-color-2: rgba(255, 255, 255, 0.3);
+                --link-color: #1E90FF;
+                --link-hover-color: #1C7ED6;
+            }
 
-        <div class="header">
-            <h1>{{ airport.name }} {% if airport.iata_code %}({{ airport.iata_code }}){% endif %}</h1>
+            /* Стили для темной темы */
+            body.dark-theme {
+                --bg-gradient-start: #2c3e50;
+                --bg-gradient-end: #34495e;
+                --text-color: #e0e0e0;
+                --heading-color: #f0f0f0;
+                --container-bg: rgba(44, 62, 80, 0.92);
+                --container-shadow-1: rgba(0, 0, 0, 0.5);
+                --container-shadow-2: rgba(0, 0, 0, 0.3);
+                --button-bg: #4a779a;
+                --button-hover-bg: #5a8aa9;
+                --button-active-bg: #3a6280;
+                --button-shadow: rgba(0, 0, 0, 0.4);
+                --button-hover-shadow: rgba(0, 0, 0, 0.5);
+                --ripple-color: rgba(0, 0, 0, 0.3);
+                --light-effect-color-1: rgba(255, 255, 255, 0.1);
+                --light-effect-color-2: rgba(255, 255, 255, 0.05);
+                --link-color: #6fa8dc;
+                --link-hover-color: #8cbcd9;
+            }
+
+            /* Стили для body: голубой градиент и анимация */
+            body {
+                font-family: 'Inter', sans-serif;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                min-height: 100vh;
+                margin: 0;
+                padding-top: 30px;
+                background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+                color: var(--text-color);
+                text-align: center;
+                overflow-x: hidden;
+                position: relative;
+                background-size: 400% 400%;
+                animation: gradientShift 8s ease infinite;
+                transition: background 0.5s ease, color 0.5s ease;
+            }
+
+            /* Анимация градиентного фона */
+            @keyframes gradientShift {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+
+            /* Световые эффекты/блики на фоне */
+            .light-effect {
+                position: absolute;
+                width: 200px;
+                height: 200px;
+                background: radial-gradient(circle, var(--light-effect-color-1) 0%, rgba(255, 255, 255, 0) 70%);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 0;
+                transition: background 0.5s ease;
+            }
+
+            /* Разные настройки для каждого светового эффекта */
+            .light-effect:nth-child(1) {
+                top: -50px;
+                left: -50px;
+                animation: lightMove 20s linear infinite alternate;
+            }
+
+            .light-effect:nth-child(2) {
+                top: auto;
+                bottom: -50px;
+                left: auto;
+                right: -50px;
+                width: 180px;
+                height: 180px;
+                animation: lightMove 25s linear infinite alternate-reverse;
+            }
+
+            .light-effect:nth-child(3) {
+                top: 20%;
+                left: 80%;
+                width: 150px;
+                height: 150px;
+                animation: lightMove 18s ease-in-out infinite alternate-reverse;
+                animation-delay: 2s;
+            }
+
+            .light-effect:nth-child(4) {
+                bottom: 10%;
+                left: 10%;
+                width: 220px;
+                height: 220px;
+                background: radial-gradient(circle, var(--light-effect-color-2) 0%, rgba(255, 255, 255, 0) 70%);
+                animation: lightMove 22s linear infinite alternate;
+                animation-delay: 4s;
+            }
+
+            /* Анимация движения световых эффектов */
+            @keyframes lightMove {
+                0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+                25% { transform: translate(calc(100vw - 100px), calc(100vh - 100px)) scale(1.1); opacity: 0.6; }
+                50% { transform: translate(calc(100vw / 2), 0) scale(0.9); opacity: 0.4; }
+                75% { transform: translate(0, calc(100vh - 100px)) scale(1.2); opacity: 0.7; }
+                100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            }
+
+            /* Основной контейнер для содержимого страницы */
+            .main-content-container {
+                background-color: var(--container-bg);
+                padding: 30px;
+                border-radius: 12px;
+                box-shadow: 0 15px 40px var(--container-shadow-1), 0 5px 10px var(--container-shadow-2);
+                transition: box-shadow 0.3s ease, background-color 0.5s ease;
+                animation: fadeIn 1s ease-out;
+                position: relative;
+                z-index: 1;
+                margin-bottom: 30px;
+                width: 90%;
+                max-width: 800px;
+                box-sizing: border-box;
+                text-align: left; /* Выравнивание текста по левому краю для детальных страниц */
+            }
+
+            .main-content-container:hover {
+                box-shadow: 0 20px 50px var(--container-shadow-1), 0 8px 15px var(--container-shadow-2);
+            }
+
+            h1 {
+                font-family: 'Montserrat', sans-serif;
+                font-size: 2.8em;
+                color: var(--heading-color);
+                margin-bottom: 20px;
+                animation: slideInDown 0.8s ease-out;
+                transition: color 0.5s ease;
+            }
+
+            h2 {
+                font-family: 'Montserrat', sans-serif;
+                font-size: 2em;
+                color: var(--heading-color);
+                margin-top: 30px;
+                margin-bottom: 15px;
+                transition: color 0.5s ease;
+            }
+
+            p {
+                font-family: 'Inter', sans-serif;
+                font-size: 1.1em;
+                color: var(--text-color);
+                line-height: 1.6;
+                margin-bottom: 10px;
+                transition: color 0.5s ease;
+            }
+
+            strong {
+                color: var(--heading-color);
+                transition: color 0.5s ease;
+            }
+
+            img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s ease;
+            }
+
+            img:hover {
+                transform: scale(1.02);
+            }
+
+            hr {
+                border: none;
+                border-top: 1px solid rgba(0, 0, 0, 0.1);
+                margin: 30px 0;
+                transition: border-color 0.5s ease;
+            }
+
+            a {
+                color: var(--link-color);
+                text-decoration: none;
+                font-weight: 600;
+                transition: color 0.3s ease, transform 0.2s ease;
+                display: inline-block;
+            }
+
+            a:hover {
+                color: var(--link-hover-color);
+                text-decoration: underline;
+                transform: translateY(-2px);
+            }
+
+            .map-link {
+                color: var(--link-color);
+                text-decoration: none;
+                transition: color 0.2s ease, text-decoration 0.2s ease;
+                white-space: nowrap;
+            }
+            .map-link:hover {
+                color: var(--link-hover-color);
+                text-decoration: underline;
+            }
+            .map-link i {
+                margin-left: 5px;
+            }
+
+            /* Стиль для кнопки переключения темы */
+            .theme-toggle-btn {
+                background-color: var(--button-bg);
+                color: white;
+                border: none;
+                padding: 10px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 1.2em;
+                transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+                box-shadow: 0 5px 15px var(--button-shadow);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                z-index: 10;
+            }
+
+            .theme-toggle-btn:hover {
+                background-color: var(--button-hover-bg);
+                transform: translateY(-2px);
+                box-shadow: 0 7px 18px var(--button-hover-shadow);
+            }
+
+            .theme-toggle-btn:active {
+                transform: translateY(0);
+                background-color: var(--button-active-bg);
+            }
+
+            /* Стиль для кнопки "Домой" */
+            .home-btn {
+                background-color: var(--button-bg);
+                color: white;
+                border: none;
+                padding: 10px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 1.2em;
+                transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+                box-shadow: 0 5px 15px var(--button-shadow);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                z-index: 10;
+            }
+
+            .home-btn:hover {
+                background-color: var(--button-hover-bg);
+                transform: translateY(-2px);
+                box-shadow: 0 7px 18px var(--button-hover-shadow);
+            }
+
+            .home-btn:active {
+                transform: translateY(0);
+                background-color: var(--button-active-bg);
+            }
+
+            /* Стиль для эффекта ряби */
+            .ripple {
+                position: absolute;
+                border-radius: 50%;
+                background: var(--ripple-color);
+                transform: scale(0);
+                animation: ripple 0.6s linear;
+                z-index: 0;
+            }
+
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+
+            /* Анимации появления элементов */
+            @keyframes fadeIn {
+                from { opacity: 0; transform: scale(0.95); }
+                to { opacity: 1; transform: scale(1); }
+            }
+
+            @keyframes slideInDown {
+                from { transform: translateY(-60px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+
+            /* Медиа-запросы для адаптивности */
+            @media (max-width: 768px) {
+                .main-content-container {
+                    width: 95%;
+                    padding: 20px;
+                }
+                h1 {
+                    font-size: 2.2em;
+                }
+                h2 {
+                    font-size: 1.8em;
+                }
+                p {
+                    font-size: 1em;
+                }
+                .theme-toggle-btn, .home-btn {
+                    top: 10px;
+                    padding: 8px 12px;
+                    font-size: 1em;
+                }
+                .home-btn {
+                    left: 10px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .main-content-container {
+                    padding: 15px;
+                }
+                h1 {
+                    font-size: 1.8em;
+                }
+                h2 {
+                    font-size: 1.5em;
+                }
+                p {
+                    font-size: 0.9em;
+                }
+                .theme-toggle-btn, .home-btn {
+                    top: 5px;
+                    padding: 6px 10px;
+                    font-size: 0.9em;
+                }
+                .home-btn {
+                    left: 5px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="light-effect"></div>
+        <div class="light-effect"></div>
+        <div class="light-effect"></div>
+        <div class="light-effect"></div>
+
+        <div class="main-content-container">
+            <button id="homeBtn" class="home-btn">
+                <i class="fas fa-home"></i>
+            </button>
+            <button id="themeToggleBtn" class="theme-toggle-btn">
+                <i class="fas fa-moon"></i>
+            </button>
+
+            <div class="header">
+                <h1>{{ airport.name }} {% if airport.iata_code %}({{ airport.iata_code }}){% endif %}</h1>
+            </div>
+
+            <p><strong>Страна:</strong> {{ airport.country }}</p>
+            <p>
+                <strong>Координаты:</strong>
+                <a href="http://maps.google.com/maps?q={{ airport.latitude }},{{ airport.longitude }}"
+                    target="_blank"
+                    title="Открыть на Google Maps"
+                    class="map-link">
+                    Широта: {{ airport.latitude }}, Долгота: {{ airport.longitude }}
+                    <i class="fas fa-map-marker-alt"></i>
+                </a>
+            </p>
+            <p><strong>IATA Код:</strong> {{ airport.iata_code }}</p>
+
+            {% if airport.description %}
+                <h2>Описание</h2>
+                <p>{{ airport.description }}</p>
+            {% endif %}
+
+            <hr>
+            <p><a href="{% url 'airport_list' %}" id="returnToListLink" class="map-link">Вернуться к списку аэропортов</a></p>
         </div>
 
-        <p><strong>Страна:</strong> {{ airport.country }}</p>
-        <p>
-            <strong>Координаты:</strong>
-            {# Ссылка на Google Maps #}
-            <a href="https://www.google.com/maps/search/?api=1&query={{ airport.latitude }},{{ airport.longitude }}"
-               target="_blank"
-               title="Открыть на Google Maps"
-               class="map-link">
-                Широта: {{ airport.latitude }}, Долгота: {{ airport.longitude }}
-                <i class="fas fa-map-marker-alt"></i> {# Иконка карты #}
-            </a>
-        </p>
-        <p><strong>IATA Код:</strong> {{ airport.iata_code }}</p>
+        <script>
+            // Функция для создания эффекта ряби на кнопках
+            function createRipple(event) {
+                const button = event.currentTarget;
+                const circle = document.createElement('span');
+                const diameter = Math.max(button.clientWidth, button.clientHeight);
+                const radius = diameter / 2;
 
-        {% if airport.description %}
-            <h2>Описание</h2>
-            <p>{{ airport.description }}</p>
-        {% endif %}
+                circle.style.width = circle.style.height = `${diameter}px`;
+                circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+                circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+                circle.classList.add('ripple');
 
-        <hr>
-        <p><a href="{% url 'airport_list' %}" class="map-link">Вернуться к списку аэропортов</a></p>
-    </div>
+                const oldRipple = button.querySelector('.ripple');
+                if (oldRipple) {
+                    oldRipple.remove();
+                }
 
-    {# Подключаем общий JS-файл для эффектов и переключения темы #}
-    {# Убедитесь, что list_airplanes.js находится в web/static/web/js/ #}
-    <script src="{% static 'web/js/list_airplanes.js' %}"></script>
-    <script>
-        // Специальная логика для этой страницы, если требуется, например, для homeBtn
-        document.addEventListener('DOMContentLoaded', () => {
-            const homeBtn = document.getElementById('homeBtn');
-            if (homeBtn) {
-                // Если homeBtn на этой странице должна вести назад к списку аэропортов
-                // (а не на главную, как в list_airplanes.js по умолчанию),
-                // то её onclick атрибут уже обрабатывает это.
-                // Просто убедимся, что эффект ряби тоже применяется.
-                homeBtn.addEventListener('click', (event) => {
-                    if (typeof createRipple === 'function') { // Проверяем, что функция определена
-                        createRipple(event);
-                    }
-                    // Переход происходит через onclick атрибут в HTML
+                button.appendChild(circle);
+
+                circle.addEventListener('animationend', () => {
+                    circle.remove();
                 });
             }
-        });
-    </script>
-</body>
-</html>
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const themeToggleBtn = document.getElementById('themeToggleBtn');
+                const homeBtn = document.getElementById('homeBtn');
+                // Удалена константа backToListBtn, так как кнопка удалена из HTML
+                const returnToListLink = document.getElementById('returnToListLink');
+                const body = document.body;
+                const themeIcon = themeToggleBtn.querySelector('i');
+
+                // Загружаем сохраненную тему при загрузке страницы
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    body.classList.add('dark-theme');
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                } else {
+                    body.classList.remove('dark-theme');
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                }
+
+                // Обработчик клика для кнопки переключения темы
+                themeToggleBtn.addEventListener('click', (event) => {
+                    body.classList.toggle('dark-theme');
+                    if (body.classList.contains('dark-theme')) {
+                        themeIcon.classList.remove('fa-moon');
+                        themeIcon.classList.add('fa-sun');
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        themeIcon.classList.remove('fa-sun');
+                        themeIcon.classList.add('fa-moon');
+                        localStorage.setItem('theme', 'light');
+                    }
+                    createRipple(event);
+                });
+
+                // Обработчик клика для кнопки "Домой"
+                homeBtn.addEventListener('click', (event) => {
+                    createRipple(event);
+                    window.location.href = '/';
+                });
+
+                // Удален обработчик клика для кнопки "Назад к списку", так как кнопка удалена
+
+                // Обработчик клика для ссылки "Вернуться к списку аэропортов"
+                if (returnToListLink) {
+                    returnToListLink.addEventListener('click', (event) => {
+                        const tempButton = document.createElement('span');
+                        tempButton.style.position = 'absolute';
+                        tempButton.style.left = event.clientX + 'px';
+                        tempButton.style.top = event.clientY + 'px';
+                        tempButton.style.width = '0';
+                        tempButton.style.height = '0';
+                        tempButton.style.overflow = 'hidden';
+                        document.body.appendChild(tempButton);
+
+                        createRipple({ currentTarget: tempButton, clientX: event.clientX, clientY: event.clientY });
+
+                        setTimeout(() => {
+                            tempButton.remove();
+                        }, 600);
+
+                        setTimeout(() => {
+                            window.location.href = returnToListLink.href;
+                        }, 100);
+                        event.preventDefault();
+                    });
+                }
+            });
+        </script>
+    </body>
+    </html>
