@@ -1,0 +1,287 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>MPS Project - Сравнение самолетов</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.tailwindcss.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://placehold.co/32x32/007bff/ffffff?text=%E2%9C%88%EF%B8%8F" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/map_style.css' %}"> {# Используем ваш существующий CSS #}
+    <style>
+        /* Дополнительные стили для сравнения */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        .comparison-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .comparison-table .highlight-mild {
+            text-decoration: underline;
+            color: #007bff; /* Или любой другой цвет для подчеркивания */
+            font-weight: 500; /* Немного выделить текст */
+        }
+        .comparison-table .highlight-strong {
+            font-weight: bold;
+            color: #dc3545; /* Красный цвет для сильного выделения */
+            background-color: #ffe0e0; /* Светло-красный фон */
+        }
+        .airplane-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .airplane-image {
+            max-width: 150px;
+            height: auto;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+            object-fit: contain; /* Чтобы изображение не обрезалось */
+        }
+        .no-selection-message {
+            background-color: #ffebee;
+            color: #d32f2f;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 20px;
+            text-align: center;
+            border: 1px solid #ef9a9a;
+        }
+    </style>
+</head>
+<body>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+
+    <div class="main-content-container">
+        <button id="homeBtn" class="home-btn">
+            <i class="fas fa-home"></i>
+        </button>
+        <button id="themeToggleBtn" class="theme-toggle-btn">
+            <i class="fas fa-moon"></i>
+        </button>
+
+        <h2 class="text-2xl font-bold mb-4 text-center">Сравнение самолетов</h2>
+        <p class="slogan">Выберите от двух до трех самолетов для сравнения их характеристик</p>
+
+        <div class="form-area p-4 bg-gray-100 rounded-lg shadow-md mb-8">
+            <form id="compareForm" action="{% url 'compare_airplanes' %}" method="GET" class="flex flex-wrap items-end gap-4 justify-center">
+                <div class="select-group">
+                    <label for="airplane1" class="font-medium text-gray-700">Самолет 1:</label>
+                    <select id="airplane1">
+                        <option value="">-- Выберите самолет --</option>
+                    </select>
+                </div>
+                <div class="select-group">
+                    <label for="airplane2" class="font-medium text-gray-700">Самолет 2:</label>
+                    <select id="airplane2">
+                        <option value="">-- Выберите самолет --</option>
+                    </select>
+                </div>
+                <div class="select-group">
+                    <label for="airplane3" class="font-medium text-gray-700">Самолет 3 (опц.):</label>
+                    <select id="airplane3">
+                        <option value="">-- Выберите самолет --</option>
+                    </select>
+                </div>
+                <input type="hidden" id="selectedAirplaneIds" name="ids">
+
+                <button type="submit" id="submitCompareBtn" class="build-route-btn px-6 py-2 rounded-md text-white bg-blue-600 hover:bg-blue-700 transition duration-300">
+                    Сравнить
+                </button>
+            </form>
+            <p class="text-sm text-gray-500 mt-2 text-center">
+                Для сравнения выберите 2 или 3 самолета.
+            </p>
+        </div>
+
+
+        {% if selected_airplanes|length < 2 %}
+            <div class="no-selection-message">
+                <p>Пожалуйста, выберите как минимум два самолета для сравнения.</p>
+                <p>Вы можете выбрать самолеты из списка на странице <a href="{% url 'airplane_list' %}" class="text-blue-600 underline">Все самолеты</a> и перейти сюда с их ID.</p>
+            </div>
+        {% else %}
+            <div class="grid grid-cols-1 md:grid-cols-{{ selected_airplanes|length }} gap-4 mb-8">
+                {% for airplane in selected_airplanes %}
+                    <div class="airplane-card bg-white shadow-lg">
+                        <h3 class="text-xl font-semibold mb-2 text-center">{{ airplane.name }}</h3>
+                        {% if airplane.image %}
+                            <img src="{{ airplane.image.url }}" alt="{{ airplane.name }}" class="airplane-image mx-auto">
+                        {% else %}
+                            <img src="{% static 'images/default_plane.png' %}" alt="Изображение не доступно" class="airplane-image mx-auto">
+                        {% endif %}
+                        <p class="text-gray-600 text-sm mt-1 text-center">Год выпуска: {{ airplane.year_of_manufacture|default:"Н/Д" }}</p>
+                        <p class="text-gray-600 text-sm mt-1 text-center">В эксплуатации: {% if airplane.in_service %}Да{% else %}Нет{% endif %}</p>
+                        <p class="text-gray-700 text-sm mt-2">{{ airplane.description|default:"Без описания." }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <h3 class="text-xl font-bold mb-4 text-center">Детальное сравнение характеристик</h3>
+            <table class="comparison-table bg-white shadow-lg">
+                <thead>
+                    <tr>
+                        <th>Характеристика</th>
+                        {% for airplane in selected_airplanes %}
+                            <th>{{ airplane.name }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {# Использование comparison_data, где уже есть классы подсветки #}
+                    <tr>
+                        <td>Вместимость пассажиров</td>
+                        {% for item in comparison_data.capacity %}
+                            <td class="{{ item.class }}">{{ item.display }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>Мощность двигателя (л.с.)</td>
+                        {% for item in comparison_data.engine_power %}
+                            <td class="{{ item.class }}">{{ item.display }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>Расход топлива (кг/час)</td>
+                        {% for item in comparison_data.consumption %}
+                            <td class="{{ item.class }}">{{ item.display }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>Крейсерская скорость (км/час)</td>
+                        {% for item in comparison_data.cruise_speed %}
+                            <td class="{{ item.class }}">{{ item.display }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>Максимальное расстояние (км)</td>
+                        {% for item in comparison_data.max_distance %}
+                            <td class="{{ item.class }}">{{ item.display }}</td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // --- Логика для переключения темы и кнопки "Домой" ---
+            const homeBtn = document.getElementById('homeBtn');
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+            const body = document.body;
+            const themeIcon = themeToggleBtn.querySelector('i');
+
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                body.classList.remove('dark-theme');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+
+            themeToggleBtn.addEventListener('click', (event) => {
+                body.classList.toggle('dark-theme');
+                if (body.classList.contains('dark-theme')) {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                    localStorage.setItem('theme', 'light');
+                }
+                // createRipple(event); // Если у вас есть эта функция и вы хотите ее использовать
+            });
+
+            homeBtn.addEventListener('click', (event) => {
+                // createRipple(event); // Если у вас есть эта функция и вы хотите ее использовать
+                window.location.href = '/';
+            });
+
+            // --- Логика для формы сравнения самолётов ---
+            const compareForm = document.getElementById('compareForm');
+            const airplaneSelects = [
+                document.getElementById('airplane1'),
+                document.getElementById('airplane2'),
+                document.getElementById('airplane3')
+            ];
+            const selectedAirplaneIdsInput = document.getElementById('selectedAirplaneIds');
+
+            // Функция для загрузки самолётов и заполнения dropdown'ов
+            async function populateAirplaneSelects() {
+                try {
+                    // Используем ваш существующий API-эндпоинт для списка самолётов
+                    const response = await fetch('/api/airplanes/');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const airplanes = await response.json(); // DRF ListAPIView обычно возвращает список напрямую
+
+                    airplaneSelects.forEach(selectElement => {
+                        let currentSelectedValue = selectElement.value; // Сохраняем текущее значение
+                        selectElement.innerHTML = '<option value="">-- Выберите самолет --</option>';
+                        airplanes.forEach(plane => {
+                            const option = document.createElement('option');
+                            option.value = plane.id;
+                            option.textContent = plane.name || plane.model; // Используем name или model
+                            selectElement.appendChild(option);
+                        });
+                        selectElement.value = currentSelectedValue; // Восстанавливаем выбранное значение
+                    });
+
+                    // Устанавливаем выбранные самолеты из URL-параметров при загрузке
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const idsParam = urlParams.get('ids');
+                    if (idsParam) {
+                        const selectedIds = idsParam.split(',').map(id => id.trim());
+                        selectedIds.forEach((id, index) => {
+                            if (airplaneSelects[index]) {
+                                airplaneSelects[index].value = id;
+                            }
+                        });
+                    }
+
+                } catch (error) {
+                    console.error('Ошибка загрузки самолётов:', error);
+                }
+            }
+            populateAirplaneSelects();
+            if (compareForm) {
+                compareForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    const selectedIds = [];
+                    airplaneSelects.forEach(selectElement => {
+                        if (selectElement.value) {
+                            selectedIds.push(selectElement.value);
+                        }
+                    });
+                    if (selectedIds.length < 2) {
+                        alert('Пожалуйста, выберите как минимум два самолета для сравнения.');
+                    }
+                    selectedAirplaneIdsInput.value = selectedIds.join(',');
+                    compareForm.submit();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

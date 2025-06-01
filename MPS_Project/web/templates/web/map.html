@@ -3,769 +3,83 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>MPS_Project</title>
+    <title>MPS Project - Карта</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            background: #fff5e1;
-            font-family: 'Inter', sans-serif;
-            padding: 1rem; /* @apply p-4; */
-            min-height: 100vh;
-        }
-        #map {
-            height: 600px;
-            width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); /* @apply shadow-lg; */
-            margin-top: 20px;
-        }
-        .form-area {
-            margin-bottom: 1.25rem; /* @apply mb-5; */
-            display: flex; /* @apply flex; */
-            flex-wrap: wrap; /* @apply flex-wrap; */
-            gap: 1.25rem; /* @apply gap-5; */
-            justify-content: center; /* @apply justify-center; */
-        }
-        .select-group {
-            display: flex; /* @apply flex; */
-            flex-direction: column; /* @apply flex-col; */
-            flex-shrink: 0;
-            min-width: 200px;
-            position: relative; /* Для позиционирования кнопки удаления */
-        }
-        select, input[type="text"] {
-            padding: 0.5rem; /* @apply p-2; */
-            margin-top: 0.5rem; /* @apply my-2; */
-            margin-bottom: 0.5rem; /* @apply my-2; */
-            display: block; /* @apply block; */
-            border-radius: 0.375rem; /* @apply rounded-md; */
-            border: 1px solid #d1d5db; /* @apply border border-gray-300; */
-            outline: 2px solid transparent; /* focus:ring-blue-500 */
-            outline-offset: 2px;
-            box-shadow: 0 0 0 0px rgba(59, 130, 246, 0.5); /* focus:ring-blue-500 */
-            border-color: #3b82f6; /* focus:border-blue-500 */
-            width: 200px;
-        }
-        select:focus, input[type="text"]:focus {
-            outline: 2px solid #3b82f6; /* focus:ring-blue-500 */
-            border-color: #3b82f6; /* focus:border-blue-500 */
-        }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://placehold.co/32x32/007bff/ffffff?text=%E2%9C%88%EF%B8%8F" type="image/x-icon">
 
-        .add-airport-btn, .build-route-btn {
-            color: white; /* @apply text-white; */
-            padding: 0.5rem 1rem; /* @apply py-2 px-4; */
-            border-radius: 0.375rem; /* @apply rounded-md; */
-            cursor: pointer; /* @apply cursor-pointer; */
-            font-size: 1rem; /* @apply text-base; */
-            margin-top: 0.5rem; /* @apply mt-2; */
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); /* @apply shadow-md; */
-            transition-property: all; /* @apply transition-all; */
-            transition-duration: 300ms; /* @apply duration-300; */
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); /* @apply ease-in-out; */
-        }
-        .add-airport-btn {
-            background-color: #22c55e; /* @apply bg-green-500; */
-            align-self: flex-start;
-            margin-top: 28px;
-            height: 42px;
-        }
-        .add-airport-btn:hover {
-            background-color: #16a34a; /* @apply hover:bg-green-600; */
-        }
-        .build-route-btn {
-            background-color: #3b82f6; /* @apply bg-blue-500; */
-            margin-left: 1.25rem; /* @apply ml-5; */
-            align-self: flex-start;
-            margin-top: 28px;
-            height: 42px;
-        }
-        .build-route-btn:hover {
-            background-color: #2563eb; /* @apply hover:bg-blue-600; */
-        }
-        .build-route-btn:disabled, .add-airport-btn:disabled {
-            background-color: #9ca3af; /* gray-400 */
-            cursor: not-allowed;
-        }
-
-        /* Кнопка удаления для select-group */
-        .remove-airport-btn {
-            position: absolute; /* @apply absolute; */
-            top: 0; /* @apply top-0; */
-            right: 0; /* @apply right-0; */
-            background-color: #ef4444; /* @apply bg-red-500; */
-            color: white; /* @apply text-white; */
-            border-radius: 9999px; /* @apply rounded-full; */
-            height: 1.5rem; /* @apply h-6; */
-            width: 1.5rem; /* @apply w-6; */
-            display: flex; /* @apply flex; */
-            align-items: center; /* @apply items-center; */
-            justify-content: center; /* @apply justify-center; */
-            font-size: 0.75rem; /* @apply text-xs; */
-            font-weight: bold; /* @apply font-bold; */
-            cursor: pointer; /* @apply cursor-pointer; */
-            transform: translate(50%, -50%); /* Смещаем кнопку, чтобы она была над углом */
-            z-index: 10; /* Убедимся, что кнопка поверх других элементов */
-        }
-        .remove-airport-btn:hover {
-            background-color: #dc2626; /* @apply hover:bg-red-600; */
-        }
-        .hidden {
-            display: none;
-        }
-
-        /* Стиль для нумерованных маркеров (начало/конец маршрута) */
-        .numbered-marker-icon {
-            background-color: #ef4444; /* red-500 */
-            border-radius: 50%;
-            color: white;
-            text-align: center;
-            line-height: 25px; /* Для центрирования текста */
-            font-weight: bold;
-            font-size: 14px;
-            border: 2px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        /* Стиль для промежуточных маркеров */
-        .intermediate-marker-icon {
-            background-color: #3b82f6; /* blue-500 */
-            border-radius: 50%;
-            color: white;
-            text-align: center;
-            line-height: 18px; /* Немного меньше для точки */
-            font-weight: bold;
-            font-size: 10px; /* Меньший размер шрифта, если все же нужен текст */
-            border: 2px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        #routeDetails {
-            margin-top: 2rem; /* @apply mt-8; */
-            padding: 1.5rem; /* @apply p-6; */
-            background-color: white; /* @apply bg-white; */
-            border-radius: 0.5rem; /* @apply rounded-lg; */
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); /* @apply shadow-lg; */
-        }
-        #routeDetails h3 {
-            font-size: 1.25rem; /* @apply text-xl; */
-            font-weight: 600; /* @apply font-semibold; */
-            margin-bottom: 1rem; /* @apply mb-4; */
-            color: #1f2937; /* @apply text-gray-800; */
-        }
-        #routeDetails p {
-            color: #374151; /* @apply text-gray-700; */
-            margin-bottom: 0.5rem; /* @apply mb-2; */
-        }
-        #routeDetails p strong {
-            color: #111827; /* @apply text-gray-900; */
-        }
-        .error-message {
-            color: #dc2626; /* @apply text-red-600; */
-            font-weight: bold; /* @apply font-bold; */
-            margin-top: 1rem; /* @apply mt-4; */
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/map_style.css' %}">
 </head>
 <body>
-    <h2 class="text-2xl font-bold mb-4 text-center">MPS Project</h2>
-    <div class="form-area" id="airportSelectionArea">
-        <div class="select-group">
-            <label for="airport1" class="font-medium text-gray-700">Выберите аэропорт 1:</label>
-            <select id="airport1">
-                <option value="">--</option>
-                {% for a in airports %}
-                    <option value="{{ a.iata_code }}" data-lat="{{ a.latitude }}" data-lon="{{ a.longitude }}" data-name="{{ a.name }}" data-country="{{ a.country }}">
-                        {{ a.name }} ({{ a.iata_code }}) - {{ a.country }}
-                    </option>
-                {% endfor %}
-            </select>
-            <input type="text" id="searchAirport1" placeholder="Поиск Аэропорта 1 (имя/IATA/страна)">
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+
+    <div class="main-content-container">
+        <button id="homeBtn" class="home-btn">
+            <i class="fas fa-home"></i>
+        </button>
+        <button id="themeToggleBtn" class="theme-toggle-btn">
+            <i class="fas fa-moon"></i>
+        </button>
+
+        <h2 class="text-2xl font-bold mb-4 text-center">MPS Project</h2>
+        <p class="slogan">Постройте оптимальный маршрут для вашего самолета</p>
+
+        <div class="form-area" id="airportSelectionArea">
+            <div class="select-group">
+                <label for="airport1" class="font-medium text-gray-700">Выберите аэропорт 1:</label>
+                <select id="airport1">
+                    <option value="">--</option>
+                </select>
+                <input type="text" id="searchAirport1" placeholder="Поиск Аэропорта 1 (имя/IATA/страна)">
+            </div>
+
+            <div class="select-group">
+                <label for="airport2" class="font-medium text-gray-700">Выберите аэропорт 2:</label>
+                <select id="airport2" disabled>
+                    <option value="">--</option>
+                </select>
+                <input type="text" id="searchAirport2" placeholder="Поиск Аэропорта 2 (имя/IATA/страна)">
+            </div>
+
+            <button type="button" id="addAirportBtn" class="add-airport-btn">+</button>
+
+            <div class="select-group">
+    <label for="aircraft" class="font-medium text-gray-700">Выберите самолет:</label>
+    <select id="aircraft">
+        <option value="">--</option>
+        <option value="1" data-in-service="true">Boeing 747</option>
+        <option value="2" data-in-service="false">Concorde</option>
+        <option value="3" data-in-service="true">Airbus A320</option>
+    </select>
+    <div id="retiredAircraftNotice" class="mt-6 bg-yellow-200 border-l-4 border-yellow-600 text-yellow-800 p-4 rounded shadow">
+        <strong>Внимание:</strong> самолёт <strong id="retiredAircraftName"></strong> выведен из эксплуатации и включён в список исключительно для демонстрации своих характеристик.
+    </div>
+</div>
+            <button type="button" id="buildRouteBtn" class="build-route-btn" disabled>Построить маршрут</button>
         </div>
 
-        <div class="select-group">
-            <label for="airport2" class="font-medium text-gray-700">Выберите аэропорт 2:</label>
-            <select id="airport2" disabled>
-                <option value="">--</option>
-                {% for a in airports %}
-                    <option value="{{ a.iata_code }}" data-lat="{{ a.latitude }}" data-lon="{{ a.longitude }}" data-name="{{ a.name }}" data-country="{{ a.country }}">
-                        {{ a.name }} ({{ a.iata_code }}) - {{ a.country }}
-                    </option>
-                {% endfor %}
-            </select>
-            <input type="text" id="searchAirport2" placeholder="Поиск Аэропорта 2 (имя/IATA/страна)">
-        </div>
+        <div id="map"></div>
 
-        <button type="button" id="addAirportBtn" class="add-airport-btn">+</button>
-
-        <div class="select-group">
-            <label for="aircraft" class="font-medium text-gray-700">Выберите самолет:</label>
-            <select id="aircraft">
-                <option value="">--</option>
-                {% for a in aircrafts %}
-                    <option value="{{ a.name }}" data-max-distance="{{ a.max_distance }}" data-cruise-speed="{{ a.cruise_speed }}" data-consumption="{{ a.consumption }}">
-                        {{ a.name }}
-                    </option>
-                {% endfor %}
-            </select>
+        <div id="routeDetails">
+            <h3>Информация о маршруте:</h3>
+            <p>Самолет: <strong id="detailPlaneName"></strong></p>
+            <p>Общая дистанция: <strong id="detailWholeDistance"></strong> км</p>
+            <p>Количество перелетов: <strong id="detailFlights"></strong></p>
+            <p>Максимальное расстояние одного перелета: <strong id="detailMaxSegmentDistance"></strong> км</p>
+            <p>Примерное время в пути: <strong id="detailTime"></strong> часов</p>
+            <p>Примерная стоимость топлива: <strong id="detailCost"></strong> $</p>
         </div>
-        <button type="button" id="buildRouteBtn" class="build-route-btn" disabled>Построить маршрут</button>
+        <div id="errorMessage" class="error-message"></div>
     </div>
 
-    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <div id="routeDetails" class="hidden">
-        <h3>Информация о маршруте:</h3>
-        <p>Самолет: <strong id="detailPlaneName"></strong></p>
-        <p>Общая дистанция: <strong id="detailWholeDistance"></strong> км</p>
-        <p>Количество перелетов: <strong id="detailFlights"></strong></p>
-        <p>Максимальное расстояние одного перелета: <strong id="detailMaxSegmentDistance"></strong> км</p>
-        <p>Примерное время в пути: <strong id="detailTime"></strong> часов</p>
-        <p>Примерная стоимость топлива: <strong id="detailCost"></strong> $</p>
-    </div>
-    <div id="errorMessage" class="error-message hidden"></div>
-
-
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-        const map = L.map('map').setView([20, 0], 2);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-        const airportSelectionArea = document.getElementById('airportSelectionArea');
-        const addAirportBtn = document.getElementById('addAirportBtn');
-        const buildRouteBtn = document.getElementById('buildRouteBtn');
-        const aircraftSelect = document.getElementById('aircraft');
-        const routeDetailsDiv = document.getElementById('routeDetails');
-        const errorMessageDiv = document.getElementById('errorMessage');
-
-        let markers = [];
-        let polylines = [];
-        let airportSelectors = [];
-        let airportSearchInputs = [];
-        let originalAirportOptions = [];
-
-        // --- НАЧАЛЬНАЯ НАСТРОЙКА ДЛЯ СУЩЕСТВУЮЩИХ ВЫБОРОВ АЭРОПОРТОВ ---
-        const airport1Select = document.getElementById('airport1');
-        const airport2Select = document.getElementById('airport2');
-        const searchAirport1Input = document.getElementById('searchAirport1');
-        const searchAirport2Input = document.getElementById('searchAirport2');
-
-        airportSelectors.push(airport1Select);
-        airportSelectors.push(airport2Select);
-        airportSearchInputs.push(searchAirport1Input);
-        airportSearchInputs.push(searchAirport2Input);
-
-        originalAirportOptions = Array.from(airport1Select.options).slice(1);
-
-        airport1Select.addEventListener('change', updateMapAndSelections);
-        searchAirport1Input.addEventListener('input', () => filterAirportOptions(airport1Select, searchAirport1Input, originalAirportOptions));
-
-        airport2Select.addEventListener('change', updateMapAndSelections);
-        searchAirport2Input.addEventListener('input', () => filterAirportOptions(airport2Select, searchAirport2Input, originalAirportOptions));
-        // --- КОНЕЦ НАЧАЛЬНОЙ НАСТРОЙКИ ---
-
-        // --- НОВЫЕ ГЛОБАЛЬНЫЕ ДАННЫЕ ДЛЯ АЭРОПОРТОВ (для фильтрации и отображения, не для расчета) ---
-        let allAirportsData = {}; // Объект для быстрого доступа к данным аэропорта по IATA
-        originalAirportOptions.forEach(option => {
-            allAirportsData[option.value] = {
-                iata_code: option.value,
-                latitude: parseFloat(option.dataset.lat),
-                longitude: parseFloat(option.dataset.lon),
-                name: option.dataset.name,
-                country: option.dataset.country
-            };
-        });
-        // --- КОНЕЦ НОВЫХ ГЛОБАЛЬНЫХ ДАННЫХ ---
-
-
-        /**
-         * Динамически инициализирует новые элементы выбора аэропортов и поля поиска.
-         * @param {number} index Индекс нового аэропорта (например, 3 для airport3).
-         */
-        function initializeNewAirportSelector(index) {
-            const selectGroup = document.createElement('div');
-            selectGroup.className = 'select-group';
-            selectGroup.id = `airportGroup${index}`;
-
-            const label = document.createElement('label');
-            label.htmlFor = `airport${index}`;
-            label.textContent = `Выберите аэропорт ${index}:`;
-            label.className = 'font-medium text-gray-700';
-            selectGroup.appendChild(label);
-
-            const selectElement = document.createElement('select');
-            selectElement.id = `airport${index}`;
-            selectElement.name = `airport${index}`;
-            selectElement.disabled = true;
-            airportSelectors.push(selectElement);
-
-            const defaultOption = document.createElement('option');
-            defaultOption.value = "";
-            defaultOption.textContent = "--";
-            selectElement.appendChild(defaultOption);
-
-            originalAirportOptions.forEach(opt => {
-                selectElement.appendChild(opt.cloneNode(true));
-            });
-
-            const searchInput = document.createElement('input');
-            searchInput.type = 'text';
-            searchInput.id = `searchAirport${index}`;
-            searchInput.placeholder = `Поиск Аэропорта ${index} (имя/IATA/страна)`;
-            searchInput.disabled = true;
-            airportSearchInputs.push(searchInput);
-
-            selectGroup.appendChild(selectElement);
-            selectGroup.appendChild(searchInput);
-
-            // Кнопка удаления для динамически добавленных аэропортов (кроме первых двух)
-            if (index > 2) { // Первые 2 аэропорта не удаляются
-                const removeBtn = document.createElement('button');
-                removeBtn.type = 'button';
-                removeBtn.className = 'remove-airport-btn';
-                removeBtn.textContent = 'x';
-                removeBtn.addEventListener('click', () => {
-                    removeAirportSelector(index);
-                });
-                selectGroup.appendChild(removeBtn);
-            }
-
-            // Вставляем новую группу перед кнопками "Добавить аэропорт" и "Построить маршрут"
-            // чтобы они оставались в конце формы
-            const addAirportBtnElement = document.getElementById('addAirportBtn'); // Получаем прямую ссылку
-            airportSelectionArea.insertBefore(selectGroup, addAirportBtnElement);
-
-
-            selectElement.addEventListener('change', updateMapAndSelections);
-            searchInput.addEventListener('input', () => {
-                filterAirportOptions(selectElement, searchInput, originalAirportOptions);
-            });
-
-            // Добавляем прокрутку к низу области формы, чтобы новый элемент был виден
-            // setTimeout для того, чтобы DOM успел обновиться и элемент появился
-            setTimeout(() => {
-                airportSelectionArea.scrollTop = airportSelectionArea.scrollHeight;
-            }, 0);
-        }
-
-        /**
-         * Удаляет селектор аэропорта и его поле поиска.
-         * @param {number} indexToRemove Индекс аэропорта для удаления (начиная с 1).
-         */
-        function removeAirportSelector(indexToRemove) {
-            if (indexToRemove <= 2) {
-                console.warn("Невозможно удалить первые два аэропорта.");
-                return;
-            }
-
-            const groupToRemove = document.getElementById(`airportGroup${indexToRemove}`);
-            if (groupToRemove) {
-                groupToRemove.remove();
-
-                // Удаляем соответствующие элементы из массивов
-                airportSelectors.splice(indexToRemove - 1, 1);
-                airportSearchInputs.splice(indexToRemove - 1, 1);
-
-                // Перенумеровываем оставшиеся элементы и их ID
-                for (let i = indexToRemove - 1; i < airportSelectors.length; i++) {
-                    const currentGroup = airportSelectors[i].closest('.select-group');
-                    const newIndex = i + 1;
-
-                    currentGroup.id = `airportGroup${newIndex}`;
-                    currentGroup.querySelector('label').htmlFor = `airport${newIndex}`;
-                    currentGroup.querySelector('label').textContent = `Выберите аэропорт ${newIndex}:`;
-                    airportSelectors[i].id = `airport${newIndex}`;
-                    airportSelectors[i].name = `airport${newIndex}`;
-                    airportSearchInputs[i].id = `searchAirport${newIndex}`;
-                    airportSearchInputs[i].placeholder = `Поиск Аэропорта ${newIndex} (имя/IATA/страна)`;
-
-                    // Обновляем обработчик события для кнопки удаления, если она есть
-                    const removeBtn = currentGroup.querySelector('.remove-airport-btn');
-                    if (removeBtn) {
-                           // Удаляем старый обработчик, чтобы не было дублирования
-                           const oldRemoveHandler = removeBtn._currentClickHandler;
-                           if (oldRemoveHandler) {
-                               removeBtn.removeEventListener('click', oldRemoveHandler);
-                           }
-                           const newRemoveHandler = () => removeAirportSelector(newIndex);
-                           removeBtn.addEventListener('click', newRemoveHandler);
-                           removeBtn._currentClickHandler = newRemoveHandler; // Сохраняем ссылку на текущий обработчик
-                    }
-                }
-            }
-            updateMapAndSelections(); // Обновляем карту и состояние кнопок
-        }
-
-
-        /**
-         * Очищает все маркеры аэропортов с карты.
-         */
-        function clearMarkers() {
-            markers.forEach(m => map.removeLayer(m));
-            markers = [];
-        }
-
-        /**
-         * Очищает все линии маршрутов с карты.
-         */
-        function clearPolylines() {
-            polylines.forEach(p => map.removeLayer(p));
-            polylines = [];
-        }
-
-        /**
-         * Скрывает детали маршрута и сообщения об ошибках.
-         */
-        function hideRouteDetailsAndErrors() {
-            routeDetailsDiv.classList.add('hidden');
-            errorMessageDiv.classList.add('hidden');
-            errorMessageDiv.textContent = '';
-        }
-
-        /**
-         * Показывает сообщение об ошибке.
-         * @param {string} message Текст сообщения об ошибке.
-         */
-        function showErrorMessage(message) {
-            errorMessageDiv.textContent = message;
-            errorMessageDiv.classList.remove('hidden');
-            routeDetailsDiv.classList.add('hidden');
-        }
-
-        /**
-         * Фильтрует опции в выпадающем списке аэропортов на основе введенного текста поиска.
-         * @param {HTMLSelectElement} selectElement Элемент <select> для фильтрации.
-         * @param {HTMLInputElement} searchInput Элемент <input> для поиска.
-         * @param {Array<HTMLOptionElement>} allOriginalOptions Все оригинальные опции аэропортов.
-         */
-        function filterAirportOptions(selectElement, searchInput, allOriginalOptions) {
-            const searchText = searchInput.value.toLowerCase();
-            const currentValue = selectElement.value;
-            selectElement.innerHTML = '';
-
-            const defaultOption = document.createElement('option');
-            defaultOption.value = "";
-            defaultOption.textContent = "--";
-            selectElement.appendChild(defaultOption);
-
-            let foundCurrentValue = false;
-
-            allOriginalOptions.forEach(option => {
-                const airportName = option.dataset.name ? option.dataset.name.toLowerCase() : '';
-                const iataCode = option.value.toLowerCase();
-                const country = option.dataset.country ? option.dataset.country.toLowerCase() : '';
-
-                if (airportName.includes(searchText) || iataCode.includes(searchText) || country.includes(searchText)) {
-                    const clonedOption = option.cloneNode(true);
-                    if (clonedOption.value === currentValue) {
-                        clonedOption.selected = true;
-                        foundCurrentValue = true;
-                    }
-                    selectElement.appendChild(clonedOption);
-                }
-            });
-
-            if (!foundCurrentValue && currentValue !== "") {
-                selectElement.value = "";
-            }
-
-            selectElement.dispatchEvent(new Event('change'));
-        }
-
-        /**
-         * Обновляет карту (маркеры), включает/отключает элементы управления
-         * в зависимости от выбранных аэропортов.
-         */
-        function updateMapAndSelections() {
-            clearMarkers();
-            clearPolylines();
-            hideRouteDetailsAndErrors();
-            let selectedAirports = [];
-            let validSelectionsCount = 0;
-
-            airportSelectors.forEach((select, index) => {
-                const option = select.selectedOptions[0];
-                if (option && option.value) {
-                    selectedAirports.push({
-                        lat: parseFloat(option.dataset.lat),
-                        lon: parseFloat(option.dataset.lon),
-                        name: option.dataset.name,
-                        iata: option.value,
-                        number: index + 1
-                    });
-                    validSelectionsCount++;
-                }
-            });
-
-            // Логика блокировки/разблокировки следующих полей
-            for (let i = 0; i < airportSelectors.length; i++) {
-                const currentSelect = airportSelectors[i];
-                const currentSearch = airportSearchInputs[i];
-                const currentGroup = currentSelect.closest('.select-group');
-                const removeBtn = currentGroup ? currentGroup.querySelector('.remove-airport-btn') : null;
-
-
-                if (i === 0) { // Airport 1 всегда доступен
-                    currentSelect.disabled = false;
-                    currentSearch.disabled = false;
-                } else {
-                    const prevSelect = airportSelectors[i - 1];
-                    if (prevSelect && prevSelect.value) {
-                        currentSelect.disabled = false;
-                        currentSearch.disabled = false;
-                        if (removeBtn) removeBtn.classList.remove('hidden'); // Показываем кнопку удаления
-                    } else {
-                        currentSelect.disabled = true;
-                        currentSelect.value = "";
-                        currentSearch.disabled = true;
-                        currentSearch.value = "";
-                        filterAirportOptions(currentSelect, currentSearch, originalAirportOptions);
-                        if (removeBtn) removeBtn.classList.add('hidden'); // Скрываем кнопку удаления
-                    }
-                }
-            }
-
-
-            // Логика для кнопки "Добавить аэропорт"
-            const lastActiveAirportSelect = airportSelectors.findLast(select => !select.disabled);
-            // Лимит на количество аэропортов
-            const maxAirports = 6;
-            if (lastActiveAirportSelect && lastActiveAirportSelect.value && airportSelectors.length < maxAirports) {
-                addAirportBtn.disabled = false;
-            } else {
-                addAirportBtn.disabled = true;
-            }
-
-
-            // Логика для кнопки "Построить маршрут"
-            if (validSelectionsCount >= 2 && aircraftSelect.value) {
-                buildRouteBtn.disabled = false;
-            } else {
-                buildRouteBtn.disabled = true;
-            }
-
-            // Отображение маркеров на карте (только выбранных аэропортов на этом этапе)
-            if (selectedAirports.length > 0) {
-                let allLatsLons = [];
-                selectedAirports.forEach(airport => {
-                    const numberIcon = L.divIcon({
-                        className: 'numbered-marker-icon',
-                        html: `<div class="marker-number">${airport.number}</div>`,
-                        iconSize: [25, 25],
-                        iconAnchor: [12, 25]
-                    });
-
-                    const m = L.marker([airport.lat, airport.lon], { icon: numberIcon }).addTo(map)
-                        .bindPopup(`<b>${airport.name}</b> (${airport.iata})`);
-                    markers.push(m);
-                    allLatsLons.push([airport.lat, airport.lon]);
-                });
-
-                if (allLatsLons.length > 0) {
-                    const bounds = L.latLngBounds(allLatsLons);
-                    map.fitBounds(bounds.pad(0.5));
-                }
-            }
-        }
-
-        /**
-         * Функция для построения маршрута на карте путем отправки запроса к бэкенду.
-         */
-        async function buildRoute() {
-            clearPolylines();
-            clearMarkers();
-            hideRouteDetailsAndErrors();
-
-            let selectedAirportIATAs = [];
-            airportSelectors.forEach(select => {
-                const option = select.selectedOptions[0];
-                if (option && option.value) {
-                    selectedAirportIATAs.push(option.value);
-                }
-            });
-
-            if (selectedAirportIATAs.length < 2) {
-                showErrorMessage("Пожалуйста, выберите как минимум два аэропорта для построения маршрута.");
-                return;
-            }
-
-            const selectedAircraftOption = aircraftSelect.selectedOptions[0];
-            let planeName = "Не выбран";
-            let maxDistance = null;
-            let cruiseSpeed = null;
-            let consumption = null;
-
-            if (selectedAircraftOption && selectedAircraftOption.value) {
-                planeName = selectedAircraftOption.value;
-                maxDistance = parseFloat(selectedAircraftOption.dataset.maxDistance);
-                cruiseSpeed = parseFloat(selectedAircraftOption.dataset.cruiseSpeed);
-                consumption = parseFloat(selectedAircraftOption.dataset.consumption);
-            } else {
-                showErrorMessage("Пожалуйста, выберите самолет для расчета маршрута.");
-                return;
-            }
-
-            // Подготовка данных для отправки на бэкенд
-            const requestData = {
-                airport_iats: selectedAirportIATAs, // Имя ключа изменено на airport_iats
-                aircraft_name: planeName,           // Теперь передаем только имя самолета
-                // Дополнительные данные о самолете (max_distance, cruise_speed, consumption)
-                // можно передать здесь, если бэкенд их не ищет по имени
-                // Но ваш бэкенд их ищет по имени, так что они здесь не нужны
-            };
-
-            try {
-                const response = await fetch('/api/calculate_route/', { // ЗАМЕНИТЕ ЭТОТ URL НА ВАШ РЕАЛЬНЫЙ API-ЭНДПОИНТ
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken') // Если используете Django CSRF
-                    },
-                    body: JSON.stringify(requestData)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Ошибка при получении данных маршрута.');
-                }
-
-               const result = await response.json();
-            console.log('Данные маршрута от бэкенда:', result);
-
-            let finalResult = result;
-            // Ваш бэкенд может вернуть {'error': '...', 'route_data': {...}}
-            // или просто {'success': true, 'route_data': {...}}
-            // или просто {...} если все хорошо.
-            // Приводим результат к единому формату для дальнейшей работы.
-            if (result.route_data) {
-                finalResult = result.route_data;
-                if (result.error) {
-                    showErrorMessage(result.error); // Показываем предупреждение/ошибку
-                }
-            } else if (result.error) {
-                showErrorMessage(result.error); // Если пришла только ошибка
-                return; // Прекращаем выполнение, если нет данных для отрисовки
-            }
-
-
-            // Отрисовка маркеров для выбранных аэропортов (начало/конец каждого сегмента)
-            // Используем finalResult.selected_airports_on_path
-            finalResult.selected_airports_on_path.forEach((iata, index) => {
-                const airportInfo = allAirportsData[iata]; // allAirportsData это глобальный объект на фронте
-                if (airportInfo) {
-                    const numberIcon = L.divIcon({
-                        className: 'numbered-marker-icon',
-                        html: `<div class="marker-number">${index + 1}</div>`,
-                        iconSize: [25, 25],
-                        iconAnchor: [12, 25]
-                    });
-                    const m = L.marker([airportInfo.latitude, airportInfo.longitude], { icon: numberIcon }).addTo(map)
-                        .bindPopup(`<b><span class="math-inline">\{airportInfo\.name\}</b\> \(</span>{iata})`);
-                    markers.push(m);
-                }
-            });
-
-            let allPathCoordinates = []; // Для фокусировки карты
-
-            // Отрисовка маршрута и промежуточных маркеров
-            // Используем finalResult.routes
-            finalResult.routes.forEach(segment => {
-                // Используем segment.path, который должен быть массивом [lat, lon] пар
-                const polyline = L.polyline(segment.path, { color: segment.is_fallback ? 'red' : 'blue', weight: 3, opacity: 0.7 }).addTo(map);
-                polylines.push(polyline);
-                allPathCoordinates = allPathCoordinates.concat(segment.path);
-            });
-
-
-            // Отрисовка маркеров для промежуточных аэропортов
-            const intermediateMarkerIcon = L.divIcon({
-                className: 'intermediate-marker-icon',
-                html: '',
-                iconSize: [15, 15],
-                iconAnchor: [7, 7]
-            });
-
-            // Используем finalResult.intermediate_airports_on_path, который содержит IATA коды
-            finalResult.intermediate_airports_on_path.forEach(iata => {
-                // Не перерисовываем маркеры, которые уже нарисованы как начальные/конечные
-                // (selected_airports_on_path содержит только IATA-коды, не lat/lon)
-                if (!finalResult.selected_airports_on_path.includes(iata)) {
-                    const airportInfo = allAirportsData[iata];
-                    if (airportInfo) {
-                        const m = L.marker([airportInfo.latitude, airportInfo.longitude], { icon: intermediateMarkerIcon }).addTo(map)
-                            .bindPopup(`<b>Промежуточная остановка:</b><br><span class="math-inline">\{airportInfo\.name\} \(</span>{iata})`);
-                        markers.push(m);
-                    }
-                }
-            });
-
-
-            // Автофокус карты на всем маршруте
-            if (allPathCoordinates.length > 0) {
-                const bounds = L.latLngBounds(allPathCoordinates);
-                map.fitBounds(bounds.pad(0.2));
-            }
-
-            // Отображение деталей маршрута
-            document.getElementById('detailPlaneName').textContent = finalResult.plane_name;
-            document.getElementById('detailWholeDistance').textContent = finalResult.total_distance.toFixed(2); // Изменено с whole_distance
-            document.getElementById('detailFlights').textContent = finalResult.total_flights; // Изменено с flights_count
-            document.getElementById('detailMaxSegmentDistance').textContent = finalResult.max_segment_distance.toFixed(2);
-            document.getElementById('detailTime').textContent = finalResult.estimated_time.toFixed(2);
-            document.getElementById('detailCost').textContent = finalResult.estimated_cost.toFixed(2);
-            routeDetailsDiv.classList.remove('hidden');
-
-            } catch (error) {
-                console.error('Ошибка при построении маршрута:', error);
-                showErrorMessage(`Ошибка: ${error.message}`);
-                // Если произошла ошибка, показываем только выбранные аэропорты
-                updateMapAndSelections();
-            }
-        }
-
-        // Функция для получения CSRF-токена (для Django)
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
-        addAirportBtn.addEventListener('click', () => {
-            const currentAirportCount = airportSelectors.length;
-            const maxAirports = 6;
-            if (currentAirportCount < maxAirports) {
-                initializeNewAirportSelector(currentAirportCount + 1);
-                updateMapAndSelections();
-            }
-        });
-
-        buildRouteBtn.addEventListener('click', buildRoute);
-        aircraftSelect.addEventListener('change', updateMapAndSelections); // Добавил слушатель для самолета
-
-        // Начальная настройка при загрузке страницы
-        airport2Select.disabled = true;
-        searchAirport2Input.disabled = true;
-
-        addAirportBtn.disabled = true;
-        buildRouteBtn.disabled = true;
-
-        // Инициализируем состояние кнопок и полей
-        updateMapAndSelections();
-
-        // Дополнительная настройка для Leaflet, чтобы карта правильно отображалась
-        map.whenReady(function(){
-            map.invalidateSize();
-        });
-
-    </script>
+<script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>

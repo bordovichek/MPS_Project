@@ -1,0 +1,129 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список самолётов</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="https://placehold.co/32x32/007bff/ffffff?text=%E2%9C%08%EF%B8%8F" type="image/x-icon">
+
+    {# Подключаем внешний CSS-файл #}
+    <link rel="stylesheet" href="{% static 'css/list_airplanes.css' %}">
+</head>
+<body>
+    {# Якорь для кнопки "Вверх" будет добавлен динамически JS #}
+
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+
+    <div class="page-container">
+        <button id="homeBtn" class="home-btn">
+            <i class="fas fa-home"></i>
+        </button>
+
+        <button id="themeToggleBtn" class="theme-toggle-btn">
+            <i class="fas fa-moon"></i>
+        </button>
+
+        <div class="header">
+            <h1>Список самолётов</h1>
+            <form method="get" class="search-form">
+                <input type="text" name="name" placeholder="Поиск по названию" value="{{ name_query|default_if_none:'' }}">
+                <button type="submit"><i class="fas fa-search"></i> Найти</button>
+            </form>
+        </div>
+
+        {# Пагинация сверху #}
+        <div class="pagination">
+            {% if airplanes.has_previous %}
+                <a href="?page={{ airplanes.previous_page_number }}{% if name_query %}&name={{ name_query }}{% endif %}">Предыдущая</a>
+            {% else %}
+                <span class="disabled-link">Предыдущая</span>
+            {% endif %}
+
+            {% for num in airplanes.paginator.page_range %}
+                {% if airplanes.number == num %}
+                    <span class="current-page">{{ num }}</span>
+                {% elif num > airplanes.number|add:'-3' and num < airplanes.number|add:'3' %}
+                    <a href="?page={{ num }}{% if name_query %}&name={{ name_query }}{% endif %}">{{ num }}</a>
+                {% elif num == airplanes.paginator.page_range.0 %}
+                     <a href="?page={{ num }}{% if name_query %}&name={{ name_query }}{% endif %}">{{ num }}</a>
+                     {% if airplanes.number|add:'-3' > airplanes.paginator.page_range.0 %}
+                         <span class="dots">...</span>
+                     {% endif %}
+                {% elif num == airplanes.paginator.page_range|last %}
+                     {% if airplanes.number|add:'3' < airplanes.paginator.page_range|last %}
+                         <span class="dots">...</span>
+                     {% endif %}
+                     <a href="?page={{ num }}{% if name_query %}&name={{ name_query }}{% endif %}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if airplanes.has_next %}
+                <a href="?page={{ airplanes.next_page_number }}{% if name_query %}&name={{ name_query }}{% endif %}">Следующая</a>
+            {% else %}
+                <span class="disabled-link">Следующая</span>
+            {% endif %}
+        </div>
+
+        {% for airplane in airplanes %}
+            <div class="airplane">
+                <div class="airplane-content">
+                    <div class="airplane-text">
+                        {# Ссылка на детальную страницу самолета #}
+                        <h2><a href="{% url 'airplane_detail' pk=airplane.pk %}" style="text-decoration: none; color: inherit;">{{ airplane.name }}</a></h2>
+                        {% if airplane.description %}
+                            <p>{{ airplane.description|truncatechars:150 }}</p> {# Ограничиваем описание для списка #}
+                        {% endif %}
+                    </div>
+                    {% if airplane.image %}
+                        <img src="{{ airplane.image.url }}" alt="Фото {{ airplane.name }}" class="airplane-photo">
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <p>Нет зарегистрированных самолётов.</p>
+        {% endfor %}
+
+        {# Пагинация снизу #}
+        <div class="pagination">
+            {% if airplanes.has_previous %}
+                <a href="?page={{ airplanes.previous_page_number }}{% if name_query %}&name={{ name_query }}{% endif %}">Предыдущая</a>
+            {% else %}
+                <span class="disabled-link">Предыдущая</span>
+            {% endif %}
+
+            {% for num in airplanes.paginator.page_range %}
+                {% if airplanes.number == num %}
+                    <span class="current-page">{{ num }}</span>
+                {% elif num > airplanes.number|add:'-3' and num < airplanes.number|add:'3' %}
+                    <a href="?page={{ num }}{% if name_query %}&name={{ name_query }}{% endif %}">{{ num }}</a>
+                {% elif num == airplanes.paginator.page_range.0 %}
+                     <a href="?page={{ num }}{% if name_query %}&name={{ name_query }}{% endif %}">{{ num }}</a>
+                     {% if airplanes.number|add:'-3' > airplanes.paginator.page_range.0 %}
+                         <span class="dots">...</span>
+                     {% endif %}
+                {% elif num == airplanes.paginator.page_range|last %}
+                     {% if airplanes.number|add:'3' < airplanes.paginator.page_range|last %}
+                         <span class="dots">...</span>
+                     {% endif %}
+                     <a href="?page={{ num }}{% if name_query %}&name={{ name_query }}{% endif %}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if airplanes.has_next %}
+                <a href="?page={{ airplanes.next_page_number }}{% if name_query %}&name={{ name_query }}{% endif %}">Следующая</a>
+            {% else %}
+                <span class="disabled-link">Следующая</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="{% static 'js/list_airplanes.js' %}"></script>
+</body>
+</html>
