@@ -23,6 +23,5 @@ def get_airports_from_openaip(limit: int = 1000, country_code: str = "RU", page 
         airports = data.get("airports", data)
         return airports
     except requests.RequestException as e:
-        print(response.text)
         print(f"Ошибка при запросе к OpenAIP API: {e}")
         return None

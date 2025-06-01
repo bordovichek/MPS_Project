@@ -2,13 +2,14 @@ import json
 
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
+from django.views.generic import TemplateView
 
 from core.logic import calculate_best_route_for_plane
 from core.models_dir import Airport, Airplane
 
 
-def home(request):
-    return render(request, "web/home.html")
+class Home(TemplateView):
+    template_name = 'web/home.html'
 
 
 def custom_404_handler(request, exception):

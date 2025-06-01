@@ -7,13 +7,13 @@ from core.logic import (
     NoRouteException
 )
 from core.models_dir import Airport, Airplane
+
+
 class RouteLogicTestCase(TestCase):
     def setUp(self):
-
         self.airport1 = Airport.objects.create(name="Airport A", iata_code="AAA", latitude=0.0, longitude=0.0)
         self.airport2 = Airport.objects.create(name="Airport B", iata_code="BBB", latitude=0.0, longitude=1.0)
         self.airport3 = Airport.objects.create(name="Airport C", iata_code="CCC", latitude=0.0, longitude=2.0)
-
 
         self.airplane = Airplane.objects.create(
             name="Test Plane",
@@ -28,7 +28,6 @@ class RouteLogicTestCase(TestCase):
         self.assertEqual(result["path_airports"], ["AAA", "BBB"])
 
     def test_dijkstra_no_route(self):
-
         with self.assertRaises(NoRouteException):
             dijkstra("AAA", "CCC", max_dist_per_segment=1)
 
@@ -50,4 +49,4 @@ class RouteLogicTestCase(TestCase):
         self.assertFalse(result["success"])
         self.assertEqual(result["error"], "Airplane not found.")
 
-# Create your tests here.
+

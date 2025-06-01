@@ -1,34 +1,39 @@
 from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.shortcuts import render
 from django.db import models
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView, TemplateView
 
 from core.models_dir import Airport, Airplane
 
 
-def flight_view(request):
-    airports = Airport.objects.all().order_by("name")
-    aircrafts = Airplane.objects.all()
-    return render(request, "web/map.html", {
-        "airports": airports,
-        "aircrafts": aircrafts,
-    })
+class FlightView(TemplateView):
+    template_name = "web/map.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["airports"] = Airport.objects.all().order_by("name")
+        context["aircrafts"] = Airplane.objects.all()
+        return context
 
 
-def airplane_list_view(request):
-    name_query = request.GET.get('name')
-    airplanes = Airplane.objects.all()
-    if name_query:
-        airplanes = airplanes.filter(name__icontains=name_query)
-    return render(request, 'web/list_airplanes.html', {'airplanes': airplanes})
+class AirplaneListView(ListView):
+    model = Airplane
+    template_name = 'web/list_airplanes.html'
+    context_object_name = 'airplanes'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        name_query = self.request.GET.get('name')
+        if name_query:
+            queryset = queryset.filter(name__icontains=name_query)
+        return queryset
 
 
 def airport_list_view(request):
-    airports = Airport.objects.all()
-
-    search_query = request.GET.get('search')
+    all_airports = Airport.objects.all()
+    search_query = request.GET.get('search', '')
     if search_query:
-        airports = airports.filter(
+        all_airports = all_airports.filter(
             models.Q(name__icontains=search_query) | models.Q(iata_code__icontains=search_query)
         ).distinct()
     sort_by = request.GET.get('sort_by', 'name')
@@ -41,9 +46,8 @@ def airport_list_view(request):
     elif sort_by == 'country':
         order_by_fields.append('country')
         order_by_fields.append('name')
-    airports = airports.order_by(*order_by_fields)
-
-    paginator = Paginator(airports, 100)
+    all_airports = all_airports.order_by(*order_by_fields)
+    paginator = Paginator(all_airports, 50)
     page_number = request.GET.get('page')
     try:
         page_obj = paginator.get_page(page_number)

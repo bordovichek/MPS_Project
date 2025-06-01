@@ -297,42 +297,47 @@
 
         /* Стили для пагинации */
         .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-top: 30px;
-            margin-bottom: 30px;
-        }
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+        gap: 8px; /* Расстояние между элементами */
+    }
 
-        .pagination a,
-        .pagination span {
-            padding: 8px 12px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
+    .pagination-link {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #337ab7;
+        background-color: #fff;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
 
-        .pagination a {
-            background-color: var(--pagination-link-bg);
-            color: var(--text-color);
-        }
+    .pagination-link:hover {
+        background-color: #e0e0e0;
+        border-color: #a0a0a0;
+    }
 
-        .pagination a:hover {
-            background-color: var(--pagination-link-hover-bg);
-            color: var(--heading-color);
-        }
+    .pagination-link.current-page {
+        background-color: #337ab7;
+        color: white;
+        border-color: #337ab7;
+        font-weight: bold;
+        cursor: default;
+    }
 
-        .pagination .current-page {
-            background-color: var(--pagination-current-bg);
-            color: var(--pagination-current-text);
-        }
+    .pagination-link.disabled {
+        color: #aaa;
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+        border-color: #eee;
+    }
 
-        .pagination .disabled-link {
-            color: var(--pagination-disabled-color);
-            cursor: not-allowed;
-        }
+    .pagination-ellipsis {
+        padding: 8px 0;
+        color: #777;
+    }
 
         /* Стиль для кнопки переключения темы */
         .theme-toggle-btn {
@@ -516,33 +521,62 @@
             <button type="submit"><i class="fas fa-search"></i> Найти</button>
         </form>
 
-        <div class="pagination">
-            {% if airports.has_previous %}
-                <a href="?page={{ airports.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">Предыдущая</a>
-            {% else %}
-                <span class="disabled-link">Предыдущая</span>
-            {% endif %}
+      <div class="pagination">
+    {% if airports.has_previous %}
+        <a href="?page={{ airports.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" class="pagination-link">Предыдущая</a>
+    {% else %}
+        <span class="pagination-link disabled">Предыдущая</span>
+    {% endif %}
 
-            {% for num in airports.paginator.page_range %}
-                {% if airports.number == num %}
-                    <span class="current-page">{{ num }}</span>
-                {% elif num > airports.number|add:'-3' and num < airports.number|add:'3' %}
-                    <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">{{ num }}</a>
-                {% elif num == airports.paginator.page_range.0 %}
-                    <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">{{ num }}</a>
-                    {% if airports.number|add:'-3' > airports.paginator.page_range.0 %}<span>...</span>{% endif %}
-                {% elif num == airports.paginator.page_range|last %}
-                    {% if airports.number|add:'3' < airports.paginator.page_range|last %}<span>...</span>{% endif %}
-                    <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">{{ num }}</a>
+    {# Генерация номеров страниц #}
+    {% with current_page=airports.number %}
+    {% with total_pages=airports.paginator.num_pages %}
+
+        {# Всегда показываем первую страницу #}
+        {% if 1 != current_page %}
+            <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" class="pagination-link">1</a>
+        {% else %}
+            <span class="pagination-link current-page">1</span>
+        {% endif %}
+
+        {# Многоточие после первой страницы, если есть пропуск #}
+        {% if current_page > 3 %} {# Если текущая страница 4 или больше, показываем "..." #}
+            <span class="pagination-ellipsis">...</span>
+        {% endif %}
+
+        {# Страницы вокруг текущей: current-1, current, current+1 #}
+        {% for num in airports.paginator.page_range %}
+            {% if num == current_page|add:"-1" or num == current_page or num == current_page|add:"1" %}
+                {# Исключаем 1 и последнюю, т.к. они обрабатываются отдельно #}
+                {% if num != 1 and num != total_pages %}
+                    {% if current_page == num %}
+                        <span class="pagination-link current-page">{{ num }}</span>
+                    {% else %}
+                        <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" class="pagination-link">{{ num }}</a>
+                    {% endif %}
                 {% endif %}
-            {% endfor %}
-
-            {% if airports.has_next %}
-                <a href="?page={{ airports.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">Следующая</a>
-            {% else %}
-                <span class="disabled-link">Следующая</span>
             {% endif %}
-        </div>
+        {% endfor %}
+        {% if current_page < total_pages|add:"-2" %}
+            <span class="pagination-ellipsis">...</span>
+        {% endif %}
+
+        {% if total_pages != current_page %}
+            <a href="?page={{ total_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&amp;sort_by={{ sort_by }}{% endif %}" class="pagination-link">{{ total_pages }}</a>
+        {% else %}
+            <span class="pagination-link current-page">{{ total_pages }}</span>
+        {% endif %}
+
+    {% endwith %}
+    {% endwith %}
+
+
+    {% if airports.has_next %}
+        <a href="?page={{ airports.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" class="pagination-link">Следующая</a>
+    {% else %}
+        <span class="pagination-link disabled">Следующая</span>
+    {% endif %}
+</div>
 
         {% for airport in airports %}
         <div class="airport">
@@ -557,33 +591,63 @@
         <p>Аэропорты не найдены.</p>
         {% endfor %}
 
-        <div class="pagination">
-            {% if airports.has_previous %}
-                <a href="?page={{ airports.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">Предыдущая</a>
-            {% else %}
-                <span class="disabled-link">Предыдущая</span>
-            {% endif %}
+       <div class="pagination">
+    {# Ссылка "Предыдущая страница" #}
+    {% if airports.has_previous %}
+        <a href="?page={{ airports.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" class="pagination-link">Предыдущая</a>
+    {% else %}
+        <span class="pagination-link disabled">Предыдущая</span>
+    {% endif %}
 
-            {% for num in airports.paginator.page_range %}
-                {% if airports.number == num %}
-                    <span class="current-page">{{ num }}</span>
-                {% elif num > airports.number|add:'-3' and num < airports.number|add:'3' %}
-                    <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">{{ num }}</a>
-                {% elif num == airports.paginator.page_range.0 %}
-                    <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">{{ num }}</a>
-                    {% if airports.number|add:'-3' > airports.paginator.page_range.0 %}<span>...</span>{% endif %}
-                {% elif num == airports.paginator.page_range|last %}
-                    {% if airports.number|add:'3' < airports.paginator.page_range|last %}<span>...</span>{% endif %}
-                    <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">{{ num }}</a>
+    {# Генерация номеров страниц #}
+    {% with current_page=airports.number %}
+    {% with total_pages=airports.paginator.num_pages %}
+
+        {# Всегда показываем первую страницу #}
+        {% if 1 != current_page %}
+            <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" class="pagination-link">1</a>
+        {% else %}
+            <span class="pagination-link current-page">1</span>
+        {% endif %}
+
+        {# Многоточие после первой страницы, если есть пропуск #}
+        {% if current_page > 3 %} {# Если текущая страница 4 или больше, показываем "..." #}
+            <span class="pagination-ellipsis">...</span>
+        {% endif %}
+
+        {# Страницы вокруг текущей: current-1, current, current+1 #}
+        {% for num in airports.paginator.page_range %}
+            {% if num == current_page|add:"-1" or num == current_page or num == current_page|add:"1" %}
+                {# Исключаем 1 и последнюю, т.к. они обрабатываются отдельно #}
+                {% if num != 1 and num != total_pages %}
+                    {% if current_page == num %}
+                        <span class="pagination-link current-page">{{ num }}</span>
+                    {% else %}
+                        <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" class="pagination-link">{{ num }}</a>
+                    {% endif %}
                 {% endif %}
-            {% endfor %}
-
-            {% if airports.has_next %}
-                <a href="?page={{ airports.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}">Следующая</a>
-            {% else %}
-                <span class="disabled-link">Следующая</span>
             {% endif %}
-        </div>
+        {% endfor %}
+        {% if current_page < total_pages|add:"-2" %}
+            <span class="pagination-ellipsis">...</span>
+        {% endif %}
+
+        {% if total_pages != current_page %}
+            <a href="?page={{ total_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&amp;sort_by={{ sort_by }}{% endif %}" class="pagination-link">{{ total_pages }}</a>
+        {% else %}
+            <span class="pagination-link current-page">{{ total_pages }}</span>
+        {% endif %}
+
+    {% endwith %}
+    {% endwith %}
+
+
+    {% if airports.has_next %}
+        <a href="?page={{ airports.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sort_by %}&sort_by={{ sort_by }}{% endif %}" class="pagination-link">Следующая</a>
+    {% else %}
+        <span class="pagination-link disabled">Следующая</span>
+    {% endif %}
+</div>
     </div>
 
     <script>
