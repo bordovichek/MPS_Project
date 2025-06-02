@@ -1,27 +1,27 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Функция для создания эффекта ряби на кнопках
     function createRipple(event) {
-        const button = event.currentTarget;
-        const circle = document.createElement('span');
-        const diameter = Math.max(button.clientWidth, button.clientHeight);
-        const radius = diameter / 2;
+            const button = event.currentTarget;
+            const circle = document.createElement('span');
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+            console.log(1111);
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `calc(50% - ${radius}px)`;
+            circle.style.top = `calc(50% - ${radius}px)`;
+            circle.classList.add('ripple');
 
-        circle.style.width = circle.style.height = `${diameter}px`;
-        circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
-        circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
-        circle.classList.add('ripple');
+            const oldRipple = button.querySelector('.ripple');
+            if (oldRipple) {
+                oldRipple.remove();
+            }
 
-        const oldRipple = button.querySelector('.ripple');
-        if (oldRipple) {
-            oldRipple.remove();
+            button.appendChild(circle);
+
+            circle.addEventListener('animationend', () => {
+                circle.remove();
+            });
         }
-
-        button.appendChild(circle);
-
-        circle.addEventListener('animationend', () => {
-            circle.remove();
-        });
-    }
 
     // Обработчик клика по кнопке поиска
     function handleSearchButtonClick(event) {

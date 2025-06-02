@@ -339,10 +339,10 @@
             const circle = document.createElement('span');
             const diameter = Math.max(button.clientWidth, button.clientHeight);
             const radius = diameter / 2;
-
+            console.log(1111);
             circle.style.width = circle.style.height = `${diameter}px`;
-            circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
-            circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+            circle.style.left = `calc(50% - ${radius}px)`;
+            circle.style.top = `calc(50% - ${radius}px)`;
             circle.classList.add('ripple');
 
             const oldRipple = button.querySelector('.ripple');

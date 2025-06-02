@@ -197,6 +197,28 @@
                 themeIcon.classList.remove('fa-sun');
                 themeIcon.classList.add('fa-moon');
             }
+            function createRipple(event) {
+            const button = event.currentTarget;
+            const circle = document.createElement('span');
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+            console.log(1111);
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `calc(50% - ${radius}px)`;
+            circle.style.top = `calc(50% - ${radius}px)`;
+            circle.classList.add('ripple');
+
+            const oldRipple = button.querySelector('.ripple');
+            if (oldRipple) {
+                oldRipple.remove();
+            }
+
+            button.appendChild(circle);
+
+            circle.addEventListener('animationend', () => {
+                circle.remove();
+            });
+        }
 
             themeToggleBtn.addEventListener('click', (event) => {
                 body.classList.toggle('dark-theme');
@@ -209,7 +231,7 @@
                     themeIcon.classList.add('fa-moon');
                     localStorage.setItem('theme', 'light');
                 }
-                // createRipple(event); // Если у вас есть эта функция и вы хотите ее использовать
+                createRipple(event); // Если у вас есть эта функция и вы хотите ее использовать
             });
 
             homeBtn.addEventListener('click', (event) => {

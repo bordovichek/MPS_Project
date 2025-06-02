@@ -551,14 +551,14 @@ if (aircraftSelectNotice) {
         }
 
         function createRipple(event) {
-            const button = event.currentTarget;
+            const button = document.getElementById('themeToggleBtn');
             const circle = document.createElement('span');
             const diameter = Math.max(button.clientWidth, button.clientHeight);
             const radius = diameter / 2;
-
+            console.log(1326);
             circle.style.width = circle.style.height = `${diameter}px`;
-            circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
-            circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+            circle.style.left = `calc(50% - ${radius}px)`;
+            circle.style.top = `calc(50% - ${radius}px)`;
             circle.classList.add('ripple');
 
             const oldRipple = button.querySelector('.ripple');
@@ -591,7 +591,9 @@ if (aircraftSelectNotice) {
             }
 
             themeToggleBtn.addEventListener('click', (event) => {
+                console.log(33);
                 body.classList.toggle('dark-theme');
+                createRipple(event);
                 if (body.classList.contains('dark-theme')) {
                     themeIcon.classList.remove('fa-moon');
                     themeIcon.classList.add('fa-sun');
@@ -601,11 +603,11 @@ if (aircraftSelectNotice) {
                     themeIcon.classList.add('fa-moon');
                     localStorage.setItem('theme', 'light');
                 }
-                createRipple(event);
+
             });
 
             homeBtn.addEventListener('click', (event) => {
-                createRipple(event);
+
                 window.location.href = '/';
             });
 
