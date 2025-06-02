@@ -1,0 +1,654 @@
+*, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-gradient-start: #89f7fe;
+            --bg-gradient-end: #66a6ff;
+            --text-color: #333;
+            --heading-color: #1f4e79;
+            --container-bg: rgba(255, 255, 255, 0.92);
+            --container-shadow-1: rgba(0, 0, 0, 0.2);
+            --container-shadow-2: rgba(0, 0, 0, 0.1);
+            --airplane-bg: #fefefe;
+            --airplane-shadow: rgba(0, 0, 0, 0.08);
+            --input-border: #a7d9ff;
+            --input-bg: #f8faff;
+            --input-focus-border: #1E90FF;
+            --input-focus-shadow: rgba(30, 144, 255, 0.3);
+            --button-bg: #1E90FF;
+            --button-hover-bg: #1C7ED6;
+            --button-active-bg: #1A75C4;
+            --button-shadow: rgba(0, 87, 184, 0.3);
+            --button-hover-shadow: rgba(0, 87, 184, 0.4);
+            --ripple-color: rgba(255, 255, 255, 0.7);
+            --light-effect-color-1: rgba(255, 255, 255, 0.4);
+            --light-effect-color-2: rgba(255, 255, 255, 0.3);
+        }
+
+        body.dark-theme {
+            --bg-gradient-start: #2c3e50;
+            --bg-gradient-end: #34495e;
+            --text-color: #e0e0e0;
+            --heading-color: #f0f0f0;
+            --container-bg: rgba(44, 62, 80, 0.92);
+            --container-shadow-1: rgba(0, 0, 0, 0.5);
+            --container-shadow-2: rgba(0, 0, 0, 0.3);
+            --airplane-bg: #3b5066;
+            --airplane-shadow: rgba(0, 0, 0, 0.3);
+            --input-border: #5a7d9a;
+            --input-bg: #4a627a;
+            --input-focus-border: #6fa8dc;
+            --input-focus-shadow: rgba(111, 168, 220, 0.3);
+            --button-bg: #4a779a;
+            --button-hover-bg: #5a8aa9;
+            --button-active-bg: #3a6280;
+            --button-shadow: rgba(0, 0, 0, 0.4);
+            --button-hover-shadow: rgba(0, 0, 0, 0.5);
+            --ripple-color: rgba(0, 0, 0, 0.3);
+            --light-effect-color-1: rgba(255, 255, 255, 0.1);
+            --light-effect-color-2: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding-top: 20px;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: var(--text-color);
+            text-align: center;
+            overflow-x: hidden;
+            position: relative;
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .light-effect {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--light-effect-color-1) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            transition: background 0.5s ease;
+        }
+
+        .light-effect:nth-child(1) {
+            top: -50px;
+            left: -50px;
+            animation: lightMove 20s linear infinite alternate;
+        }
+
+        .light-effect:nth-child(2) {
+            top: auto;
+            bottom: -50px;
+            left: auto;
+            right: -50px;
+            width: 180px;
+            height: 180px;
+            animation: lightMove 25s linear infinite alternate-reverse;
+        }
+
+        .light-effect:nth-child(3) {
+            top: 20%;
+            left: 80%;
+            width: 150px;
+            height: 150px;
+            animation: lightMove 18s ease-in-out infinite alternate-reverse;
+            animation-delay: 2s;
+        }
+
+        .light-effect:nth-child(4) {
+            bottom: 10%;
+            left: 10%;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, var(--light-effect-color-2) 0%, rgba(255, 255, 255, 0) 70%);
+            animation: lightMove 22s linear infinite alternate;
+            animation-delay: 4s;
+        }
+
+        @keyframes lightMove {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            25% { transform: translate(calc(100vw - 100px), calc(100vh - 100px)) scale(1.1); opacity: 0.6; }
+            50% { transform: translate(calc(100vw / 2), 0) scale(0.9); opacity: 0.4; }
+            75% { transform: translate(0, calc(100vh - 100px)) scale(1.2); opacity: 0.7; }
+            100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+        }
+
+        .main-content-container {
+            background-color: var(--container-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px var(--container-shadow-1), 0 5px 10px var(--container-shadow-2);
+            transition: box-shadow 0.3s ease, background-color 0.5s ease;
+            animation: fadeIn 1s ease-out;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 20px;
+            width: calc(100% - 60px);
+            max-width: none;
+            box-sizing: border-box;
+        }
+
+        .main-content-container:hover {
+            box-shadow: 0 20px 50px var(--container-shadow-1), 0 8px 15px var(--container-shadow-2);
+        }
+
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5em;
+            color: var(--heading-color);
+            margin-bottom: 10px;
+            animation: slideInDown 0.8s ease-out;
+            transition: color 0.5s ease;
+        }
+
+        .slogan {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1em;
+            color: var(--text-color);
+            margin-bottom: 25px;
+            animation: fadeIn 1s ease-out 0.3s backwards;
+            transition: color 0.5s ease;
+        }
+
+        .form-area {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .select-group {
+            flex: 1 1 calc(50% - 7.5px);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+            margin-bottom: 0;
+            position: relative; /* Для позиционирования кнопки удаления */
+        }
+
+        .select-group:last-of-type {
+            flex: 1 1 100%;
+        }
+
+        .select-group label {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            color: var(--heading-color);
+            font-size: 1em;
+            transition: color 0.5s ease;
+        }
+
+        .select-group select,
+        .select-group input[type="text"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid var(--input-border);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95em;
+            color: var(--text-color);
+            background-color: var(--input-bg);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.5s ease, color 0.5s ease;
+        }
+
+        .select-group select:focus,
+        .select-group input[type="text"]:focus {
+            outline: none;
+            border-color: var(--input-focus-border);
+            box-shadow: 0 0 0 4px var(--input-focus-shadow), inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .add-airport-btn,
+        .build-route-btn {
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px var(--button-shadow);
+            clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px), 0 15px);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            margin-top: 10px;
+        }
+
+        .add-airport-btn:hover,
+        .build-route-btn:hover {
+            background-color: var(--button-hover-bg);
+            transform: translateY(-3px) scale(1.02) perspective(1000px) rotateX(2deg);
+            box-shadow: 0 7px 18px var(--button-hover-shadow);
+        }
+
+        .add-airport-btn:active,
+        .build-route-btn:active {
+            transform: translateY(-1px) scale(1.005);
+            background-color: var(--button-active-bg);
+        }
+
+        .build-route-btn:disabled {
+            background-color: var(--input-border); /* Используем цвет рамки для отключенной кнопки */
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .add-airport-btn i,
+        .build-route-btn i {
+            margin-right: 6px;
+            font-size: 0.9em;
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--ripple-color);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            z-index: 0;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        #map {
+            height: 500px;
+            width: calc(100% - 60px);
+            max-width: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            margin-top: 20px;
+            z-index: 1;
+        }
+
+        #routeDetails {
+            background-color: var(--container-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px var(--container-shadow-2);
+            margin-top: 20px;
+            width: calc(100% - 60px);
+            max-width: none;
+            text-align: left;
+            box-sizing: border-box;
+            transition: opacity 0.5s ease, transform 0.5s ease, background-color 0.5s ease;
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+        }
+        #routeDetails.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        #routeDetails h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.6em;
+            color: var(--heading-color);
+            margin-top: 0;
+            margin-bottom: 10px;
+            text-align: center;
+            transition: color 0.5s ease;
+        }
+
+        #routeDetails p {
+            font-family: 'Inter', sans-serif;
+            font-size: 1em;
+            line-height: 1.5;
+            color: var(--text-color);
+            margin-bottom: 6px;
+            transition: color 0.5s ease;
+        }
+
+        #routeDetails strong {
+            color: var(--button-bg);
+            transition: color 0.5s ease;
+        }
+
+        #retiredAircraftNotice {
+            margin-top: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: var(--input-bg); /* Используем цвет фона ввода для уведомления */
+            border-left: 5px solid #ffc107;
+            color: var(--text-color); /* Используем основной цвет текста */
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: opacity 0.5s ease, transform 0.5s ease, background-color 0.5s ease, color 0.5s ease;
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+        }
+        #retiredAircraftNotice.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        #errorMessage {
+            background-color: var(--container-bg); /* Используем цвет фона контейнера */
+            border-left: 5px solid #dc3545;
+            color: #dc3545; /* Красный цвет для текста ошибки */
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: left;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-sizing: border-box;
+            transition: opacity 0.5s ease, transform 0.5s ease, background-color 0.5s ease, color 0.5s ease;
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+        }
+        #errorMessage.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideInDown {
+            from { transform: translateY(-60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .theme-toggle-btn {
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px var(--button-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+        }
+
+        .theme-toggle-btn:hover {
+            background-color: var(--button-hover-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 18px var(--button-hover-shadow);
+        }
+
+        .theme-toggle-btn:active {
+            transform: translateY(0);
+            background-color: var(--button-active-bg);
+        }
+
+        .home-btn {
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px var(--button-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+        }
+
+        .home-btn:hover {
+            background-color: var(--button-hover-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 18px var(--button-hover-shadow);
+        }
+
+        .home-btn:active {
+            transform: translateY(0);
+            background-color: var(--button-active-bg);
+        }
+
+        .remove-airport-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #ef4444;
+            color: #fff;
+            border-radius: 9999px;
+            height: 1.5rem;
+            width: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transform: translate(50%, -50%);
+            z-index: 10;
+        }
+        .remove-airport-btn:hover {
+            background-color: #dc2626;
+        }
+
+        .numbered-marker-icon {
+            position: relative;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .numbered-marker-icon .marker-number {
+            position: absolute;
+            top: 0px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: blue;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+            font-size: 10px;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        .numbered-marker-icon .marker-iata-code {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 8px;
+            font-weight: bold;
+            color: black;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 1px 3px;
+            border-radius: 2px;
+            z-index: 1;
+        }
+
+        .intermediate-marker-icon {
+            position: relative;
+            text-align: center;
+            white-space: nowrap;
+            background-color: blue;
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+            border: 1px solid white;
+            box-sizing: border-box;
+        }
+
+        .intermediate-marker-icon .marker-iata-code {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 8px;
+            font-weight: bold;
+            color: black;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 1px 3px;
+            border-radius: 2px;
+            line-height: normal;
+        }
+
+        @media (max-width: 768px) {
+            .main-content-container, #map, #routeDetails, #errorMessage {
+                width: calc(100% - 30px);
+                padding: 15px;
+            }
+            h2 {
+                font-size: 2.2em;
+            }
+            .slogan {
+                font-size: 1.1em;
+            }
+            .select-group {
+                flex: 1 1 100%;
+            }
+            .add-airport-btn, .build-route-btn {
+                padding: 10px 20px;
+                font-size: 0.95em;
+            }
+            #map {
+                height: 350px;
+            }
+            .theme-toggle-btn, .home-btn {
+                top: 10px;
+                padding: 8px 12px;
+                font-size: 1em;
+            }
+            .home-btn {
+                left: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 1.6em;
+            }
+            .slogan {
+                font-size: 0.9em;
+            }
+            .select-group label {
+                font-size: 0.9em;
+            }
+            .select-group select,
+            .select-group input[type="text"] {
+                padding: 6px 10px;
+                font-size: 0.85em;
+            }
+            .add-airport-btn, .build-route-btn {
+                padding: 8px 15px;
+                font-size: 0.85em;
+            }
+            #map {
+                height: 250px;
+            }
+            #routeDetails, #errorMessage {
+                padding: 10px;
+                font-size: 0.85em;
+            }
+            .theme-toggle-btn, .home-btn {
+                top: 5px;
+                padding: 6px 10px;
+                font-size: 0.9em;
+            }
+            .home-btn {
+                left: 5px;
+            }
+        }
+#retiredAircraftNotice {
+    margin-top: 10px; /* Изначальный верхний отступ */
+    padding: 12px; /* Изначальные внутренние отступы */
+    border-radius: 8px;
+    background-color: #fef3c7; /* Светло-жёлтый по умолчанию */
+    border-left: 5px solid #f59e0b; /* Янтарный */
+    color: #92400e;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95em;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    pointer-events: none;
+
+    transition: opacity 0.5s ease,
+                height 0.5s ease,
+                padding 0.5s ease,
+                margin 0.5s ease,
+                background-color 0.5s ease,
+                color 0.5s ease,
+                border-color 0.5s ease;
+}
+
+#retiredAircraftNotice.show {
+    opacity: 1;
+    height: auto;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    margin-top: 10px;
+    pointer-events: auto;
+}
+
+
+body.dark-theme #retiredAircraftNotice {
+    background-color: #3b3b3b;
+    border-left-color: #facc15;
+    color: #facc15;
+}
+
+.hidden {
+    display: none !important;
+}

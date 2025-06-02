@@ -24,13 +24,6 @@ class Airport(models.Model):
                 i += 1
         super().save(*args, **kwargs)
 
-    def __str__(self):
-        return (
-            f"{self.iata_code} — "
-            f"{self.city} ({self.rus_city or 'рус. не указано'}), "
-            f"{self.country}, "
-            f"Координаты: {self.latitude}, {self.longitude}"
-        )
 
 
 def get_all_airports():

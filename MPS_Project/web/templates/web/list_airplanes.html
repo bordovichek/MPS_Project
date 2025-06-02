@@ -1,124 +1,163 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Список самолётов</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="https://placehold.co/32x32/007bff/ffffff?text=%E2%9C%08%EF%B8%8F" type="image/x-icon">
+
+    <link rel="stylesheet" href="{% static 'css/list_airplanes.css' %}">
     <style>
-        body {
-            font-family: sans-serif;
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 20px;
-            line-height: 1.6;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 30px;
-            margin: 0;
-        }
-
-        .search-form input[type="text"] {
-            padding: 8px 12px;
-            font-size: 16px;
-            width: 250px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .search-form button {
-            padding: 8px 15px;
-            font-size: 16px;
-            margin-left: 8px;
-            cursor: pointer;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            transition: background-color 0.2s ease;
-        }
-
-        .search-form button:hover {
-            background-color: #0056b3;
-        }
-
-        .airplane {
+        /* Общие стили для контейнера сортировки */
+        .sort-section {
+            background-color: var(--card-bg-color);
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem; /* Немного уменьшил padding */
             margin-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: var(--text-color);
+            display: flex; /* Для выравнивания элементов */
+            align-items: center; /* Выравнивание по центру */
+            gap: 10px; /* Отступ между элементами */
         }
-
-        .airplane:last-child {
-            border-bottom: none;
+        body.dark-theme .sort-section {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
-
-        .airplane-content {
+        .sort-section label {
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .sort-section select {
+            padding: 0.6rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.3rem;
+            background-color: var(--input-bg-color);
+            color: var(--text-color);
+            flex-grow: 1; /* Чтобы select занимал доступное пространство */
+            max-width: 250px; /* Ограничим ширину */
+        }
+        body.dark-theme .sort-section select {
+            background-color: #333;
+            border-color: #555;
+            color: #eee;
+        }
+        /* Стили для кнопки поиска (если оставим) */
+        .search-form {
             display: flex;
-            align-items: flex-start;
-            gap: 30px;
+            align-items: center;
+            gap: 10px;
         }
-
-        .airplane-text {
-            flex: 1;
+        .search-form input {
+            padding: 0.6rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.3rem;
+            background-color: var(--input-bg-color);
+            color: var(--text-color);
         }
-
-        .airplane h2 {
-            margin: 0 0 10px 0;
-            font-size: 26px;
-            color: #003366;
+        body.dark-theme .search-form input {
+            background-color: #333;
+            border-color: #555;
+            color: #eee;
         }
-
-        .airplane p {
-            margin: 0;
-            font-size: 16px;
-            color: #444;
+        .search-form button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-color);
+            padding: 0.5rem;
         }
-
-        .airplane-photo {
-            max-width: 300px;
-            max-height: 225px;
-            width: auto;
-            height: auto;
-            object-fit: cover;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+        .search-form button i {
+            font-size: 1.2em;
+        }
+        body.dark-theme .search-form button {
+            color: #eee;
+        }
+        .no-results-message {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 1.2em;
+            color: var(--text-color);
         }
     </style>
 </head>
 <body>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
+    <div class="light-effect"></div>
 
-    <div class="header">
-        <h1>Список самолётов</h1>
-        <form method="get" class="search-form">
-            <input type="text" name="name" placeholder="Поиск по названию" value="{{ request.GET.name }}">
-            <button type="submit">Найти</button>
-        </form>
-    </div>
+    <div class="page-container">
+        <button id="homeBtn" class="home-btn">
+            <i class="fas fa-home"></i>
+        </button>
 
-    {% for airplane in airplanes %}
-        <div class="airplane">
-            <div class="airplane-content">
-                <div class="airplane-text">
-                    <h2>{{ airplane.name }}</h2>
-                    {% if airplane.description %}
-                        <p>{{ airplane.description }}</p>
+        <button id="themeToggleBtn" class="theme-toggle-btn">
+            <i class="fas fa-moon"></i>
+        </button>
+
+        <div class="header">
+            <h1>Список самолётов</h1>
+        </div>
+
+        {# Секция сортировки #}
+        <div class="sort-section">
+            <form method="get" class="sort-form" style="width: 100%; display: flex; align-items: center; gap: 15px;">
+                <label for="sort_by">Сортировать по:</label>
+                <select id="sort_by" name="sort_by" onchange="this.form.submit()">
+                    <option value="name" {% if current_sort_by == 'name' %}selected{% endif %}>Названию (А-Я)</option>
+                    <option value="-name" {% if current_sort_by == '-name' %}selected{% endif %}>Названию (Я-А)</option>
+                    <option value="year_of_manufacture" {% if current_sort_by == 'year_of_manufacture' %}selected{% endif %}>Году выпуска (по возрастанию)</option>
+                    <option value="-year_of_manufacture" {% if current_sort_by == '-year_of_manufacture' %}selected{% endif %}>Году выпуска (по убыванию)</option>
+                    <option value="capacity" {% if current_sort_by == 'capacity' %}selected{% endif %}>Вместимости (по возрастанию)</option>
+                    <option value="-capacity" {% if current_sort_by == '-capacity' %}selected{% endif %}>Вместимости (по убыванию)</option>
+                    <option value="engine_power" {% if current_sort_by == 'engine_power' %}selected{% endif %}>Мощности двигателя (по возрастанию)</option>
+                    <option value="-engine_power" {% if current_sort_by == '-engine_power' %}selected{% endif %}>Мощности двигателя (по убыванию)</option>
+                    <option value="consumption" {% if current_sort_by == 'consumption' %}selected{% endif %}>Расход топлива (по возрастанию)</option>
+                    <option value="-consumption" {% if current_sort_by == '-consumption' %}selected{% endif %}>Расход топлива (по убыванию)</option>
+                    <option value="cruise_speed" {% if current_sort_by == 'cruise_speed' %}selected{% endif %}>Крейсерской скорости (по возрастанию)</option>
+                    <option value="-cruise_speed" {% if current_sort_by == '-cruise_speed' %}selected{% endif %}>Крейсерской скорости (по убыванию)</option>
+                    <option value="max_distance" {% if current_sort_by == 'max_distance' %}selected{% endif %}>Макс. расстоянию (по возрастанию)</option>
+                    <option value="-max_distance" {% if current_sort_by == '-max_distance' %}selected{% endif %}>Макс. расстоянию (по убыванию)</option>
+                    <option value="in_service" {% if current_sort_by == 'in_service' %}selected{% endif %}>В эксплуатации (Нет)</option>
+                    <option value="-in_service" {% if current_sort_by == '-in_service' %}selected{% endif %}>В эксплуатации (Да)</option>
+                </select>
+                {# <button type="submit">Сортировать</button> #}
+            </form>
+            <form method="get" class="search-form">
+                <input type="text" name="name" placeholder="Поиск по названию" value="{{ name_query|default_if_none:'' }}">
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </form>
+        </div>
+
+        {# Удалены блоки пагинации #}
+
+        {% for airplane in airplanes %}
+            <div class="airplane">
+                <div class="airplane-content">
+                    <div class="airplane-text">
+                        <h2><a href="{% url 'airplane_detail' pk=airplane.pk %}" style="text-decoration: none; color: inherit;">{{ airplane.name }}</a></h2>
+                        {% if airplane.description %}
+                            <p>{{ airplane.description|truncatechars:150 }}</p>
+                        {% endif %}
+                    </div>
+                    {% if airplane.image %}
+                        <a href="{% url 'airplane_detail' pk=airplane.pk %}">
+                            <img src="{{ airplane.image.url }}" alt="Фото {{ airplane.name }}" class="airplane-photo">
+                        </a>
                     {% endif %}
                 </div>
-                {% if airplane.image %}
-                    <img src="{{ airplane.image.url }}" alt="Фото {{ airplane.name }}" class="airplane-photo">
-                {% endif %}
             </div>
-        </div>
-    {% empty %}
-        <p>Нет зарегистрированных самолётов.</p>
-    {% endfor %}
+        {% empty %}
+            <p class="no-results-message">Нет зарегистрированных самолётов.</p>
+        {% endfor %}
 
+
+    </div>
+
+    <script src="{% static 'js/list_airplanes.js' %}"></script>
 </body>
 </html>
