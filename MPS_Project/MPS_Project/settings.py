@@ -67,7 +67,7 @@ MIDDLEWARE = [
 # CACHE_MIDDLEWARE_KEY_PREFIX = 'MPS_Project'
 
 ROOT_URLCONF = 'MPS_Project.urls'
-
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -104,7 +104,7 @@ DATABASES = {
 }
 # CACHES = {
 #     "default": {
-#         "BACKEND": "django.core.cache.backends.redis.RedisCache",
+#         "BACKEND": "django.core.cache.;backends.redis.RedisCache",
 #         "LOCATION": "redis://127.0.0.1:6379",
 #     }
 # }

@@ -23,10 +23,38 @@ class AirplaneListView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        sort_by = self.request.GET.get('sort_by', 'name')
         name_query = self.request.GET.get('name')
+        in_service_filter = self.request.GET.get('in_service')
+        allowed_sort_fields = [
+            'name', 'year_of_manufacture', 'capacity', 'engine_power',
+            'consumption', 'cruise_speed', 'max_distance', 'in_service'
+        ]
         if name_query:
             queryset = queryset.filter(name__icontains=name_query)
+        if in_service_filter == 'true':
+            queryset = queryset.filter(in_service=True)
+        elif in_service_filter == 'false':
+            queryset = queryset.filter(in_service=False)
+        if sort_by.startswith('-'):
+            field = sort_by[1:]
+            if field in allowed_sort_fields:
+                queryset = queryset.order_by(sort_by)
+            else:
+                queryset = queryset.order_by('name')
+        elif sort_by in allowed_sort_fields:
+            queryset = queryset.order_by(sort_by)
+        else:
+            queryset = queryset.order_by('name')
+
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['current_sort_by'] = self.request.GET.get('sort_by', 'name')
+        context['name_query'] = self.request.GET.get('name', '')
+        context['in_service_filter'] = self.request.GET.get('in_service', 'all')
+        return context
 
 
 def airport_list_view(request):

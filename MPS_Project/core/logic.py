@@ -172,12 +172,6 @@ def dijkstra(start_iata, end_iata, max_dist_per_segment):
 
 
 def calculate_best_route_for_plane(route_iatas: list[str], airplane_id: int = None):
-    """
-    Рассчитывает лучший маршрут для заданного самолета (или без самолета).
-    Объединяет логику get_best_route_with_plane и get_best_route_without_plane.
-    Использует Django ORM для получения данных о самолете.
-    """
-
     selected_plane = None
     if airplane_id:
         try:
@@ -189,7 +183,6 @@ def calculate_best_route_for_plane(route_iatas: list[str], airplane_id: int = No
                 "error": "Airplane not found."
             }
 
-    # Если самолет не выбран, или у него нет max_distance, используем дефолт
     initial_max_dist_per_segment = selected_plane.max_distance if selected_plane and selected_plane.max_distance else 7000
 
     total_whole_distance = 0

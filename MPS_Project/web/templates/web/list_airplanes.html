@@ -10,12 +10,81 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href="https://placehold.co/32x32/007bff/ffffff?text=%E2%9C%08%EF%B8%8F" type="image/x-icon">
 
-    {# Подключаем внешний CSS-файл #}
     <link rel="stylesheet" href="{% static 'css/list_airplanes.css' %}">
+    <style>
+        /* Общие стили для контейнера сортировки */
+        .sort-section {
+            background-color: var(--card-bg-color);
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem; /* Немного уменьшил padding */
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: var(--text-color);
+            display: flex; /* Для выравнивания элементов */
+            align-items: center; /* Выравнивание по центру */
+            gap: 10px; /* Отступ между элементами */
+        }
+        body.dark-theme .sort-section {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .sort-section label {
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .sort-section select {
+            padding: 0.6rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.3rem;
+            background-color: var(--input-bg-color);
+            color: var(--text-color);
+            flex-grow: 1; /* Чтобы select занимал доступное пространство */
+            max-width: 250px; /* Ограничим ширину */
+        }
+        body.dark-theme .sort-section select {
+            background-color: #333;
+            border-color: #555;
+            color: #eee;
+        }
+        /* Стили для кнопки поиска (если оставим) */
+        .search-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .search-form input {
+            padding: 0.6rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.3rem;
+            background-color: var(--input-bg-color);
+            color: var(--text-color);
+        }
+        body.dark-theme .search-form input {
+            background-color: #333;
+            border-color: #555;
+            color: #eee;
+        }
+        .search-form button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-color);
+            padding: 0.5rem;
+        }
+        .search-form button i {
+            font-size: 1.2em;
+        }
+        body.dark-theme .search-form button {
+            color: #eee;
+        }
+        .no-results-message {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 1.2em;
+            color: var(--text-color);
+        }
+    </style>
 </head>
 <body>
-    {# Якорь для кнопки "Вверх" будет добавлен динамически JS #}
-
     <div class="light-effect"></div>
     <div class="light-effect"></div>
     <div class="light-effect"></div>
@@ -32,96 +101,61 @@
 
         <div class="header">
             <h1>Список самолётов</h1>
+        </div>
+
+        {# Секция сортировки #}
+        <div class="sort-section">
+            <form method="get" class="sort-form" style="width: 100%; display: flex; align-items: center; gap: 15px;">
+                <label for="sort_by">Сортировать по:</label>
+                <select id="sort_by" name="sort_by" onchange="this.form.submit()">
+                    <option value="name" {% if current_sort_by == 'name' %}selected{% endif %}>Названию (А-Я)</option>
+                    <option value="-name" {% if current_sort_by == '-name' %}selected{% endif %}>Названию (Я-А)</option>
+                    <option value="year_of_manufacture" {% if current_sort_by == 'year_of_manufacture' %}selected{% endif %}>Году выпуска (по возрастанию)</option>
+                    <option value="-year_of_manufacture" {% if current_sort_by == '-year_of_manufacture' %}selected{% endif %}>Году выпуска (по убыванию)</option>
+                    <option value="capacity" {% if current_sort_by == 'capacity' %}selected{% endif %}>Вместимости (по возрастанию)</option>
+                    <option value="-capacity" {% if current_sort_by == '-capacity' %}selected{% endif %}>Вместимости (по убыванию)</option>
+                    <option value="engine_power" {% if current_sort_by == 'engine_power' %}selected{% endif %}>Мощности двигателя (по возрастанию)</option>
+                    <option value="-engine_power" {% if current_sort_by == '-engine_power' %}selected{% endif %}>Мощности двигателя (по убыванию)</option>
+                    <option value="consumption" {% if current_sort_by == 'consumption' %}selected{% endif %}>Расход топлива (по возрастанию)</option>
+                    <option value="-consumption" {% if current_sort_by == '-consumption' %}selected{% endif %}>Расход топлива (по убыванию)</option>
+                    <option value="cruise_speed" {% if current_sort_by == 'cruise_speed' %}selected{% endif %}>Крейсерской скорости (по возрастанию)</option>
+                    <option value="-cruise_speed" {% if current_sort_by == '-cruise_speed' %}selected{% endif %}>Крейсерской скорости (по убыванию)</option>
+                    <option value="max_distance" {% if current_sort_by == 'max_distance' %}selected{% endif %}>Макс. расстоянию (по возрастанию)</option>
+                    <option value="-max_distance" {% if current_sort_by == '-max_distance' %}selected{% endif %}>Макс. расстоянию (по убыванию)</option>
+                    <option value="in_service" {% if current_sort_by == 'in_service' %}selected{% endif %}>В эксплуатации (Нет)</option>
+                    <option value="-in_service" {% if current_sort_by == '-in_service' %}selected{% endif %}>В эксплуатации (Да)</option>
+                </select>
+                {# <button type="submit">Сортировать</button> #}
+            </form>
             <form method="get" class="search-form">
                 <input type="text" name="name" placeholder="Поиск по названию" value="{{ name_query|default_if_none:'' }}">
-                <button type="submit"><i class="fas fa-search"></i> Найти</button>
+                <button type="submit"><i class="fas fa-search"></i></button>
             </form>
         </div>
 
-        {# Пагинация сверху #}
-        <div class="pagination">
-            {% if airplanes.has_previous %}
-                <a href="?page={{ airplanes.previous_page_number }}{% if name_query %}&name={{ name_query }}{% endif %}">Предыдущая</a>
-            {% else %}
-                <span class="disabled-link">Предыдущая</span>
-            {% endif %}
-
-            {% for num in airplanes.paginator.page_range %}
-                {% if airplanes.number == num %}
-                    <span class="current-page">{{ num }}</span>
-                {% elif num > airplanes.number|add:'-3' and num < airplanes.number|add:'3' %}
-                    <a href="?page={{ num }}{% if name_query %}&name={{ name_query }}{% endif %}">{{ num }}</a>
-                {% elif num == airplanes.paginator.page_range.0 %}
-                     <a href="?page={{ num }}{% if name_query %}&name={{ name_query }}{% endif %}">{{ num }}</a>
-                     {% if airplanes.number|add:'-3' > airplanes.paginator.page_range.0 %}
-                         <span class="dots">...</span>
-                     {% endif %}
-                {% elif num == airplanes.paginator.page_range|last %}
-                     {% if airplanes.number|add:'3' < airplanes.paginator.page_range|last %}
-                         <span class="dots">...</span>
-                     {% endif %}
-                     <a href="?page={{ num }}{% if name_query %}&name={{ name_query }}{% endif %}">{{ num }}</a>
-                {% endif %}
-            {% endfor %}
-
-            {% if airplanes.has_next %}
-                <a href="?page={{ airplanes.next_page_number }}{% if name_query %}&name={{ name_query }}{% endif %}">Следующая</a>
-            {% else %}
-                <span class="disabled-link">Следующая</span>
-            {% endif %}
-        </div>
+        {# Удалены блоки пагинации #}
 
         {% for airplane in airplanes %}
             <div class="airplane">
                 <div class="airplane-content">
                     <div class="airplane-text">
-                        {# Ссылка на детальную страницу самолета #}
                         <h2><a href="{% url 'airplane_detail' pk=airplane.pk %}" style="text-decoration: none; color: inherit;">{{ airplane.name }}</a></h2>
                         {% if airplane.description %}
-                            <p>{{ airplane.description|truncatechars:150 }}</p> {# Ограничиваем описание для списка #}
+                            <p>{{ airplane.description|truncatechars:150 }}</p>
                         {% endif %}
                     </div>
                     {% if airplane.image %}
-                        <img src="{{ airplane.image.url }}" alt="Фото {{ airplane.name }}" class="airplane-photo">
+                        <a href="{% url 'airplane_detail' pk=airplane.pk %}">
+                            <img src="{{ airplane.image.url }}" alt="Фото {{ airplane.name }}" class="airplane-photo">
+                        </a>
                     {% endif %}
                 </div>
             </div>
         {% empty %}
-            <p>Нет зарегистрированных самолётов.</p>
+            <p class="no-results-message">Нет зарегистрированных самолётов.</p>
         {% endfor %}
 
-        {# Пагинация снизу #}
-        <div class="pagination">
-            {% if airplanes.has_previous %}
-                <a href="?page={{ airplanes.previous_page_number }}{% if name_query %}&name={{ name_query }}{% endif %}">Предыдущая</a>
-            {% else %}
-                <span class="disabled-link">Предыдущая</span>
-            {% endif %}
 
-            {% for num in airplanes.paginator.page_range %}
-                {% if airplanes.number == num %}
-                    <span class="current-page">{{ num }}</span>
-                {% elif num > airplanes.number|add:'-3' and num < airplanes.number|add:'3' %}
-                    <a href="?page={{ num }}{% if name_query %}&name={{ name_query }}{% endif %}">{{ num }}</a>
-                {% elif num == airplanes.paginator.page_range.0 %}
-                     <a href="?page={{ num }}{% if name_query %}&name={{ name_query }}{% endif %}">{{ num }}</a>
-                     {% if airplanes.number|add:'-3' > airplanes.paginator.page_range.0 %}
-                         <span class="dots">...</span>
-                     {% endif %}
-                {% elif num == airplanes.paginator.page_range|last %}
-                     {% if airplanes.number|add:'3' < airplanes.paginator.page_range|last %}
-                         <span class="dots">...</span>
-                     {% endif %}
-                     <a href="?page={{ num }}{% if name_query %}&name={{ name_query }}{% endif %}">{{ num }}</a>
-                {% endif %}
-            {% endfor %}
-
-            {% if airplanes.has_next %}
-                <a href="?page={{ airplanes.next_page_number }}{% if name_query %}&name={{ name_query }}{% endif %}">Следующая</a>
-            {% else %}
-                <span class="disabled-link">Следующая</span>
-            {% endif %}
-        </div>
     </div>
 
     <script src="{% static 'js/list_airplanes.js' %}"></script>

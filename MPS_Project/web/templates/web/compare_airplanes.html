@@ -11,53 +11,532 @@
     <link rel="icon" href="https://placehold.co/32x32/007bff/ffffff?text=%E2%9C%88%EF%B8%8F" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'css/map_style.css' %}"> {# Используем ваш существующий CSS #}
     <style>
-        /* Дополнительные стили для сравнения */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        /* Определение CSS-переменных для светлой и темной темы */
+        :root {
+            --bg-gradient-start: #89f7fe;
+            --bg-gradient-end: #66a6ff;
+            --text-color: #333;
+            --heading-color: #1f4e79;
+            --container-bg: rgba(255, 255, 255, 0.92);
+            --container-shadow-1: rgba(0, 0, 0, 0.2);
+            --container-shadow-2: rgba(0, 0, 0, 0.1);
+            --button-bg: #1E90FF;
+            --button-hover-bg: #1C7ED6;
+            --button-active-bg: #1A75C4;
+            --button-shadow: rgba(0, 87, 184, 0.3);
+            --button-hover-shadow: rgba(0, 87, 184, 0.4);
+            --ripple-color: rgba(255, 255, 255, 0.7);
+            --light-effect-color-1: rgba(255, 255, 255, 0.4);
+            --light-effect-color-2: rgba(255, 255, 255, 0.3);
+            --link-color: #1E90FF;
+            --link-hover-color: #1C7ED6;
+        }
+
+        /* Стили для темной темы */
+        body.dark-theme {
+            --bg-gradient-start: #2c3e50;
+            --bg-gradient-end: #34495e;
+            --text-color: #e0e0e0;
+            --heading-color: #f0f0f0;
+            --container-bg: rgba(44, 62, 80, 0.92);
+            --container-shadow-1: rgba(0, 0, 0, 0.5);
+            --container-shadow-2: rgba(0, 0, 0, 0.3);
+            --button-bg: #4a779a;
+            --button-hover-bg: #5a8aa9;
+            --button-active-bg: #3a6280;
+            --button-shadow: rgba(0, 0, 0, 0.4);
+            --button-hover-shadow: rgba(0, 0, 0, 0.5);
+            --ripple-color: rgba(0, 0, 0, 0.3);
+            --light-effect-color-1: rgba(255, 255, 255, 0.1);
+            --light-effect-color-2: rgba(255, 255, 255, 0.05);
+            --link-color: #6fa8dc;
+            --link-hover-color: #8cbcd9;
+        }
+
+        /* Стили для body: голубой градиент и анимация */
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Выравнивание по верху */
+            min-height: 100vh;
+            margin: 0;
+            padding-top: 30px; /* Отступ сверху */
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: var(--text-color);
+            text-align: center;
+            overflow-x: hidden;
+            position: relative;
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        /* Анимация градиентного фона */
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Световые эффекты/блики на фоне */
+        .light-effect {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--light-effect-color-1) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            transition: background 0.5s ease;
+        }
+
+        /* Разные настройки для каждого светового эффекта */
+        .light-effect:nth-child(1) {
+            top: -50px;
+            left: -50px;
+            animation: lightMove 20s linear infinite alternate;
+        }
+
+        .light-effect:nth-child(2) {
+            top: auto;
+            bottom: -50px;
+            left: auto;
+            right: -50px;
+            width: 180px;
+            height: 180px;
+            animation: lightMove 25s linear infinite alternate-reverse;
+        }
+
+        .light-effect:nth-child(3) {
+            top: 20%;
+            left: 80%;
+            width: 150px;
+            height: 150px;
+            animation: lightMove 18s ease-in-out infinite alternate-reverse;
+            animation-delay: 2s;
+        }
+
+        .light-effect:nth-child(4) {
+            bottom: 10%;
+            left: 10%;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, var(--light-effect-color-2) 0%, rgba(255, 255, 255, 0) 70%);
+            animation: lightMove 22s linear infinite alternate;
+            animation-delay: 4s;
+        }
+
+        /* Анимация движения световых эффектов */
+        @keyframes lightMove {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            25% { transform: translate(calc(100vw - 100px), calc(100vh - 100px)) scale(1.1); opacity: 0.6; }
+            50% { transform: translate(calc(100vw / 2), 0) scale(0.9); opacity: 0.4; }
+            75% { transform: translate(0, calc(100vh - 100px)) scale(1.2); opacity: 0.7; }
+            100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+        }
+
+        /* Основной контейнер для содержимого страницы */
+        .main-content-container {
+            background-color: var(--container-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px var(--container-shadow-1), 0 5px 10px var(--container-shadow-2);
+            transition: box-shadow 0.3s ease, background-color 0.5s ease;
+            animation: fadeIn 1s ease-out;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 30px;
+            width: 90%;
+            max-width: 1200px; /* Увеличиваем максимальную ширину для сравнения */
+            box-sizing: border-box;
+        }
+
+        .main-content-container:hover {
+            box-shadow: 0 20px 50px var(--container-shadow-1), 0 8px 15px var(--container-shadow-2);
+        }
+
+        h2 { /* Заголовок страницы "Сравнение самолетов" */
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.2em; /* Уменьшаем размер для общего заголовка */
+            color: var(--heading-color);
+            margin-bottom: 20px;
+            animation: slideInDown 0.8s ease-out;
+            transition: color 0.5s ease;
+        }
+        h3 { /* Заголовок для детального сравнения */
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8em;
+            color: var(--heading-color);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            transition: color 0.5s ease;
+        }
+        p {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1em;
+            color: var(--text-color);
+            line-height: 1.6;
+            margin-bottom: 10px;
+            transition: color 0.5s ease;
+        }
+
+        strong {
+            color: var(--heading-color);
+            transition: color 0.5s ease;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            margin: 30px 0;
+            transition: border-color 0.5s ease;
+        }
+
+        a {
+            color: var(--link-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease, transform 0.2s ease;
+            display: inline-block; /* Для применения transform */
+        }
+
+        a:hover {
+            color: var(--link-hover-color);
+            text-decoration: underline;
+            transform: translateY(-2px);
+        }
+
+        /* Стиль для кнопки переключения темы */
+        .theme-toggle-btn {
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px var(--button-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+        }
+
+        .theme-toggle-btn:hover {
+            background-color: var(--button-hover-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 18px var(--button-hover-shadow);
+        }
+
+        .theme-toggle-btn:active {
+            transform: translateY(0);
+            background-color: var(--button-active-bg);
+        }
+
+        /* Стиль для кнопки "Домой" */
+        .home-btn {
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px var(--button-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+        }
+
+        .home-btn:hover {
+            background-color: var(--button-hover-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 18px var(--button-hover-shadow);
+        }
+
+        .home-btn:active {
+            transform: translateY(0);
+            background-color: var(--button-active-bg);
+        }
+
+        /* Стиль для эффекта ряби */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--ripple-color);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            z-index: 0;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Анимации появления элементов */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideInDown {
+            from { transform: translateY(-60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .airplane-cards-container {
+            display: flex;
+            flex-wrap: wrap; /* Позволяет карточкам переноситься на новую строку при нехватке места */
+            gap: 18px; /* Отступы между карточками */
+            justify-content: center; /* Центрирование карточек */
+            margin-bottom: 30px;
+        }
+
+        .airplane-card {
+            background-color: var(--container-bg); /* Используем фоновый цвет контейнера */
+            border-radius: 11px;
+            box-shadow: 0 5px 15px var(--container-shadow-1), 0 2px 5px var(--container-shadow-2);
+            padding: 20px;
+            text-align: center;
+            width: calc(33.333% - 20px); /* Для 3 самолетов, 10px gap с каждой стороны */
+            min-width: 280px; /* Минимальная ширина для карточки */
+            flex-grow: 1; /* Позволяет карточкам растягиваться, если их меньше 3-х */
+            transition: box-shadow 0.3s ease, transform 0.3s ease, background-color 0.5s ease;
+        }
+
+        .airplane-card:hover {
+            transform: translateY(-5px); /* Легкий эффект поднятия при наведении */
+            box-shadow: 0 8px 20px var(--container-shadow-1), 0 4px 8px var(--container-shadow-2);
+        }
+
+        .airplane-image-wrapper {
+            width: 100%;
+            max-width: 250px; /* Увеличиваем размер контейнера для изображения */
+            height: 180px; /* Фиксированная высота для единообразия */
+            overflow: hidden; /* Скрываем части изображения, если оно не вписывается */
+            margin: 0 auto 15px auto; /* Центрируем и добавляем отступ */
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0; /* Легкий фон для пустых мест */
+        }
+
+        body.dark-theme .airplane-image-wrapper {
+            background-color: #333;
+        }
+
+        .airplane-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Сохраняем пропорции, вписывая изображение в контейнер */
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .airplane-image:hover {
+            transform: scale(1.05);
+        }
+
+        .airplane-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.6em; /* Жирное название */
+            font-weight: bold;
+            color: var(--heading-color);
+            margin-bottom: 15px;
+            transition: color 0.5s ease;
+        }
+
+        .characteristics-box {
+            border: 1px solid rgba(0, 0, 0, 0.1); /* Тонкая рамочка */
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px; /* Отступ от названия/фото */
+            background-color: rgba(255, 255, 255, 0.7); /* Легкий фон внутри рамочки */
+            text-align: left; /* Выравнивание текста характеристик по левому краю */
+            transition: background-color 0.5s ease, border-color 0.5s ease;
+        }
+
+        body.dark-theme .characteristics-box {
+            border-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .characteristics-box p {
+            font-size: 0.95em;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .characteristics-box p:last-child {
+            margin-bottom: 0; /* Убираем нижний отступ у последнего абзаца */
+        }
+
+
         .comparison-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px var(--container-shadow-1), 0 2px 5px var(--container-shadow-2);
+            border-radius: 12px;
+            overflow: hidden; /* Для применения border-radius к таблице */
         }
         .comparison-table th, .comparison-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 12px 15px;
             text-align: left;
-            vertical-align: top;
+            vertical-align: middle; /* Выравнивание по середине */
+            transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease;
+        }
+        body.dark-theme .comparison-table th, body.dark-theme .comparison-table td {
+             border-color: rgba(255, 255, 255, 0.1);
         }
         .comparison-table th {
-            background-color: #f2f2f2;
+            background-color: var(--button-bg); /* Более яркий фон для заголовков */
+            color: white;
             font-weight: bold;
+            font-family: 'Montserrat', sans-serif;
         }
+        body.dark-theme .comparison-table th {
+            background-color: var(--button-hover-bg);
+        }
+        .comparison-table tr:nth-child(even) { /* Чередующийся фон для строк */
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+        body.dark-theme .comparison-table tr:nth-child(even) {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        .comparison-table tr:nth-child(odd) {
+            background-color: var(--container-bg);
+        }
+        body.dark-theme .comparison-table tr:nth-child(odd) {
+            background-color: rgba(44, 62, 80, 0.8);
+        }
+
+        /* Выделение значений в таблице */
         .comparison-table .highlight-mild {
             text-decoration: underline;
-            color: #007bff; /* Или любой другой цвет для подчеркивания */
-            font-weight: 500; /* Немного выделить текст */
+            color: var(--link-color);
+            font-weight: 500;
+        }
+        body.dark-theme .comparison-table .highlight-mild {
+            color: var(--link-hover-color);
         }
         .comparison-table .highlight-strong {
             font-weight: bold;
             color: #dc3545; /* Красный цвет для сильного выделения */
             background-color: #ffe0e0; /* Светло-красный фон */
         }
-        .airplane-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
+        body.dark-theme .comparison-table .highlight-strong {
+            color: #ff9999; /* Светлее красный для темной темы */
+            background-color: #5c0f16; /* Более темный красный фон */
         }
-        .airplane-image {
-            max-width: 150px;
-            height: auto;
-            border-radius: 0.25rem;
-            margin-bottom: 0.5rem;
-            object-fit: contain; /* Чтобы изображение не обрезалось */
-        }
+
         .no-selection-message {
-            background-color: #ffebee;
-            color: #d32f2f;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-top: 20px;
-            text-align: center;
-            border: 1px solid #ef9a9a;
+    background-color: #e0f2f7; /* Очень светло-голубой */
+    color: #0056b3;           /* Темно-синий текст */
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 20px;
+    text-align: center;
+    border: 1px solid #a7d9ed; /* Немного более темная синяя рамка */
+    transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+}
+body.dark-theme .no-selection-message {
+    background-color: #1a3a50; /* Темно-синий фон для темной темы */
+    color: #92c5df;           /* Светло-голубой текст для темной темы */
+    border-color: #3b7ea6;    /* Немного более светлая синяя рамка для темной темы */
+}
+
+
+        /* Медиа-запросы для адаптивности */
+        @media (max-width: 1024px) {
+            .airplane-card {
+                width: calc(50% - 20px); /* 2 самолета в ряд на средних экранах */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content-container {
+                width: 95%;
+                padding: 20px;
+            }
+            .airplane-card {
+                width: 100%; /* 1 самолет в ряд на маленьких экранах */
+                margin-bottom: 20px; /* Отступ между карточками */
+            }
+            .airplane-cards-container {
+                flex-direction: column; /* Карточки сверху вниз на очень маленьких экранах */
+                gap: 20px;
+            }
+            .comparison-table th, .comparison-table td {
+                padding: 8px 10px;
+                font-size: 0.9em;
+            }
+             h2 {
+                font-size: 1.8em;
+            }
+            h3 {
+                font-size: 1.5em;
+            }
+            p {
+                font-size: 1em;
+            }
+            .theme-toggle-btn, .home-btn {
+                top: 10px;
+                padding: 8px 12px;
+                font-size: 1em;
+            }
+            .home-btn {
+                left: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content-container {
+                padding: 15px;
+            }
+            .comparison-table {
+                font-size: 0.8em;
+            }
+            .airplane-name {
+                font-size: 1.4em;
+            }
+            h2 {
+                font-size: 1.5em;
+            }
+            h3 {
+                font-size: 1.2em;
+            }
+            p {
+                font-size: 0.9em;
+            }
+            .theme-toggle-btn, .home-btn {
+                top: 5px;
+                padding: 6px 10px;
+                font-size: 0.9em;
+            }
+            .home-btn {
+                left: 5px;
+            }
         }
     </style>
 </head>
@@ -116,24 +595,36 @@
                 <p>Вы можете выбрать самолеты из списка на странице <a href="{% url 'airplane_list' %}" class="text-blue-600 underline">Все самолеты</a> и перейти сюда с их ID.</p>
             </div>
         {% else %}
-            <div class="grid grid-cols-1 md:grid-cols-{{ selected_airplanes|length }} gap-4 mb-8">
+            {# Новый контейнер для карточек, чтобы они шли слева направо #}
+            <div class="airplane-cards-container">
                 {% for airplane in selected_airplanes %}
-                    <div class="airplane-card bg-white shadow-lg">
-                        <h3 class="text-xl font-semibold mb-2 text-center">{{ airplane.name }}</h3>
-                        {% if airplane.image %}
-                            <img src="{{ airplane.image.url }}" alt="{{ airplane.name }}" class="airplane-image mx-auto">
-                        {% else %}
-                            <img src="{% static 'images/default_plane.png' %}" alt="Изображение не доступно" class="airplane-image mx-auto">
-                        {% endif %}
-                        <p class="text-gray-600 text-sm mt-1 text-center">Год выпуска: {{ airplane.year_of_manufacture|default:"Н/Д" }}</p>
-                        <p class="text-gray-600 text-sm mt-1 text-center">В эксплуатации: {% if airplane.in_service %}Да{% else %}Нет{% endif %}</p>
-                        <p class="text-gray-700 text-sm mt-2">{{ airplane.description|default:"Без описания." }}</p>
+                    <div class="airplane-card">
+                        {# Контейнер для фото с фиксированной высотой #}
+                        <div class="airplane-image-wrapper">
+                            {% if airplane.image %}
+                                <img src="{{ airplane.image.url }}" alt="{{ airplane.name }}" class="airplane-image">
+                            {% else %}
+                                <img src="{% static 'images/default_plane.png' %}" alt="Изображение не доступно" class="airplane-image">
+                            {% endif %}
+                        </div>
+                        <h3 class="airplane-name">{{ airplane.name }}</h3> {# Жирное название #}
+
+                        {# Характеристики в отдельной рамочке #}
+                        <div class="characteristics-box">
+                            <p><strong>Год выпуска:</strong> {{ airplane.year_of_manufacture|default:"Н/Д" }}</p>
+                            <p><strong>Вместимость пассажиров:</strong> {{ airplane.capacity|default:"Н/Д" }}</p>
+                            <p><strong>Мощность двигателя:</strong> {{ airplane.engine_power|default:"Н/Д" }} л.с.</p>
+                            <p><strong>Расход топлива:</strong> {{ airplane.consumption|default:"Н/Д" }} кг/час</p>
+                            <p><strong>Крейсерская скорость:</strong> {{ airplane.cruise_speed|default:"Н/Д" }} км/час</p>
+                            <p><strong>Максимальное расстояние:</strong> {{ airplane.max_distance|default:"Н/Д" }} км</p>
+                            <p><strong>В эксплуатации:</strong> {% if airplane.in_service %}Да{% else %}Нет{% endif %}</p>
+                        </div>
                     </div>
                 {% endfor %}
             </div>
 
             <h3 class="text-xl font-bold mb-4 text-center">Детальное сравнение характеристик</h3>
-            <table class="comparison-table bg-white shadow-lg">
+            <table class="comparison-table">
                 <thead>
                     <tr>
                         <th>Характеристика</th>
@@ -198,27 +689,27 @@
                 themeIcon.classList.add('fa-moon');
             }
             function createRipple(event) {
-            const button = event.currentTarget;
-            const circle = document.createElement('span');
-            const diameter = Math.max(button.clientWidth, button.clientHeight);
-            const radius = diameter / 2;
-            console.log(1111);
-            circle.style.width = circle.style.height = `${diameter}px`;
-            circle.style.left = `calc(50% - ${radius}px)`;
-            circle.style.top = `calc(50% - ${radius}px)`;
-            circle.classList.add('ripple');
+                const button = event.currentTarget;
+                const circle = document.createElement('span');
+                const diameter = Math.max(button.clientWidth, button.clientHeight);
+                const radius = diameter / 2;
+                console.log(1111);
+                circle.style.width = circle.style.height = `${diameter}px`;
+                circle.style.left = `calc(50% - ${radius}px)`;
+                circle.style.top = `calc(50% - ${radius}px)`;
+                circle.classList.add('ripple');
 
-            const oldRipple = button.querySelector('.ripple');
-            if (oldRipple) {
-                oldRipple.remove();
+                const oldRipple = button.querySelector('.ripple');
+                if (oldRipple) {
+                    oldRipple.remove();
+                }
+
+                button.appendChild(circle);
+
+                circle.addEventListener('animationend', () => {
+                    circle.remove();
+                });
             }
-
-            button.appendChild(circle);
-
-            circle.addEventListener('animationend', () => {
-                circle.remove();
-            });
-        }
 
             themeToggleBtn.addEventListener('click', (event) => {
                 body.classList.toggle('dark-theme');

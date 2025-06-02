@@ -3,7 +3,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Детали самолета: {{ airplane.name }}</title>
+    <title>{{ airplane.name }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@600&display=swap" rel="stylesheet">
@@ -161,16 +161,27 @@
             box-shadow: 0 20px 50px var(--container-shadow-1), 0 8px 15px var(--container-shadow-2);
         }
 
-        h1 {
+        /* **** ИЗМЕНЕНИЯ ЗДЕСЬ **** */
+        .page-title {
             font-family: 'Montserrat', sans-serif;
-            font-size: 2.8em;
+            font-size: 2.8em; /* Оставляем большой размер для имени самолета */
             color: var(--heading-color);
-            margin-bottom: 20px;
+            margin-top: 0; /* Убираем верхний отступ */
+            margin-bottom: 10px; /* Уменьшаем нижний отступ */
             animation: slideInDown 0.8s ease-out;
             transition: color 0.5s ease;
         }
 
-        h2 {
+        .section-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em; /* Мелкий шрифт */
+            color: var(--text-color); /* Менее выделяющийся цвет */
+            opacity: 0.7; /* Добавляем прозрачность */
+            margin-bottom: 5px; /* Небольшой отступ от названия */
+            transition: color 0.5s ease, opacity 0.5s ease;
+        }
+
+        h2 { /* Это теперь для "Описание" */
             font-family: 'Montserrat', sans-serif;
             font-size: 2em;
             color: var(--heading-color);
@@ -178,6 +189,8 @@
             margin-bottom: 15px;
             transition: color 0.5s ease;
         }
+        /* ************************ */
+
 
         p {
             font-family: 'Inter', sans-serif;
@@ -323,8 +336,11 @@
                 width: 95%;
                 padding: 20px;
             }
-            h1 {
+            .page-title {
                 font-size: 2.2em;
+            }
+            .section-subtitle {
+                font-size: 0.8em;
             }
             h2 {
                 font-size: 1.8em;
@@ -346,8 +362,11 @@
             .main-content-container {
                 padding: 15px;
             }
-            h1 {
+            .page-title {
                 font-size: 1.8em;
+            }
+            .section-subtitle {
+                font-size: 0.75em;
             }
             h2 {
                 font-size: 1.5em;
@@ -380,7 +399,10 @@
             <i class="fas fa-moon"></i>
         </button>
 
-        <h1>Детали самолета: {{ airplane.name }}</h1>
+        {# Добавили мелкий текст "Информация о самолете" #}
+        <p class="section-subtitle">Информация о самолете</p>
+        {# Главное название самолета #}
+        <h1 class="page-title">{{ airplane.name }}</h1>
 
         {% if airplane.image %}
             <img src="{{ airplane.image.url }}" alt="Фото самолета {{ airplane.name }}">

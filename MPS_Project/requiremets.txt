@@ -2,8 +2,6 @@ ansicon==1.89.0
 asgiref==3.8.1
 asttokens==3.0.0
 blessed==1.21.0
-bpython==0.25
-certifi==2025.4.26
 charset-normalizer==3.4.2
 colorama==0.4.6
 curtsies==0.4.2
@@ -26,7 +24,6 @@ matplotlib-inline==0.1.7
 parso==0.8.4
 pillow==11.2.1
 prompt_toolkit==3.0.51
-psycopg2==2.9.10
 pure_eval==0.2.3
 Pygments==2.19.1
 python-dotenv==1.1.0

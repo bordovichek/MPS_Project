@@ -32,6 +32,18 @@ class AirplaneAdmin(admin.ModelAdmin):
         return "No image"
 
 
+
+
 @admin.register(Airport)
 class AirportAdmin(admin.ModelAdmin):
-    list_display = ('iata_code', 'country', 'name', 'latitude', 'longitude')
+    list_display = ('iata_code', 'name', 'country', 'latitude', 'longitude',)
+    fields = ('iata_code', 'name', 'country', 'latitude', 'longitude', 'description',)
+    search_fields = ['name', 'iata_code', 'country']
+    ordering = ['name', 'country']
+    list_filter = ('country',)
+    actions = ['clear_description']
+
+    @admin.action(description='Очистить описание выбранных аэропортов')
+    def clear_description(self, request, queryset):
+        count = queryset.update(description="No description")
+        self.message_user(request, f"Описание {count} аэропортов очищено.")

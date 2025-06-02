@@ -35,7 +35,8 @@ def calculate_route_view(request):
         except Exception as e:
             return JsonResponse({"success": False, "error": f"An unexpected error occurred: {str(e)}"}, status=500)
     else:
-        return JsonResponse({"success": False, "error": "Only POST requests are allowed."}, status=405)
+        return JsonResponse({"success": False, "error": f"Only POST requests are allowed. Received: {request.method}"},
+                            status=405)
 
 
 def get_initial_data_view(request):
@@ -50,9 +51,12 @@ def get_initial_data_view(request):
 def compare_airplanes_view(request):
     airplane_ids_str = request.GET.get('ids')
     selected_airplanes = []
-    comparison_attributes = [
-        'capacity', 'engine_power', 'consumption',
-        'cruise_speed', 'max_distance'
+
+    attributes_bigger_is_better = [
+        'capacity', 'engine_power', 'cruise_speed', 'max_distance'
+    ]
+    attributes_smaller_is_better = [
+        'consumption'
     ]
 
     if airplane_ids_str:
@@ -68,38 +72,70 @@ def compare_airplanes_view(request):
 
     comparison_data = {}
     if len(selected_airplanes) >= 2:
-        for attr in comparison_attributes:
-            values = [getattr(plane, attr, 0) or 0 for plane in selected_airplanes]
-            numeric_values = [v for v in values if v is not None and v != 0]
-            comparison_data[attr] = []
-            if len(numeric_values) >= 2:
-                for i, plane in enumerate(selected_airplanes):
-                    current_value = getattr(plane, attr, 0) or 0
-                    highlight_class = ""
-                    if current_value is not None and current_value != 0:
-                        max_diff_percent = 0.0
-                        for other_val in numeric_values:
-                            if other_val != 0:
-                                diff_percent = abs(current_value - other_val) / other_val * 100
-                                if diff_percent > max_diff_percent:
-                                    max_diff_percent = diff_percent
-                        if max_diff_percent > 200:
-                            highlight_class = "highlight-strong"
-                        elif max_diff_percent >= 51:
-                            highlight_class = "highlight-mild"
+        all_comparison_attributes = attributes_bigger_is_better + attributes_smaller_is_better
 
-                    comparison_data[attr].append({
-                        'value': current_value if current_value is not None else "Н/Д",
-                        'display': getattr(plane, attr) if getattr(plane, attr) is not None else "Н/Д",
-                        'class': highlight_class
-                    })
-            else:
-                for plane in selected_airplanes:
-                    comparison_data[attr].append({
-                        'value': getattr(plane, attr, 0) or 0,
-                        'display': getattr(plane, attr) if getattr(plane, attr) is not None else "Н/Д",
-                        'class': ""
-                    })
+        for attr in all_comparison_attributes:
+            values_with_planes = []
+            for plane in selected_airplanes:
+                val = getattr(plane, attr)
+                if val is None:
+                    values_with_planes.append({'value': None, 'plane': plane, 'display': "Н/Д"})
+                elif isinstance(val, (int, float)):
+                    values_with_planes.append({'value': val, 'plane': plane, 'display': val})
+                else:
+                    values_with_planes.append({'value': None, 'plane': plane, 'display': val})
+
+            numeric_values_for_sort = [item['value'] for item in values_with_planes if item['value'] is not None]
+
+            if len(numeric_values_for_sort) < 2:
+                comparison_data[attr] = [{'display': item['display'], 'class': ""} for item in values_with_planes]
+                continue
+
+            sorted_unique_values = sorted(list(set(numeric_values_for_sort)))
+
+            min_val = sorted_unique_values[0]
+            max_val = sorted_unique_values[-1]
+
+            attr_results = []
+            for item in values_with_planes:
+                current_value = item['value']
+                display_value = item['display']
+                highlight_class = ""
+
+                if current_value is not None:
+                    if len(selected_airplanes) == 2:
+                        if attr in attributes_bigger_is_better:
+                            if current_value == max_val:
+                                highlight_class = "highlight-mild"
+                        elif attr in attributes_smaller_is_better:
+                            if current_value == min_val:
+                                highlight_class = "highlight-mild"
+                    elif len(selected_airplanes) == 3:
+                        if attr in attributes_bigger_is_better:
+                            if current_value == max_val:
+                                highlight_class = "highlight-mild"
+                            elif current_value == min_val:
+                                highlight_class = "highlight-strong"
+                        elif attr in attributes_smaller_is_better:
+                            if current_value == min_val:
+                                highlight_class = "highlight-mild"
+                            elif current_value == max_val:
+                                highlight_class = "highlight-strong"
+
+                attr_results.append({
+                    'display': display_value,
+                    'class': highlight_class
+                })
+            comparison_data[attr] = attr_results
+    else:
+        all_comparison_attributes = attributes_bigger_is_better + attributes_smaller_is_better
+        for attr in all_comparison_attributes:
+            comparison_data[attr] = []
+            for plane in selected_airplanes:
+                comparison_data[attr].append({
+                    'display': getattr(plane, attr) if getattr(plane, attr) is not None else "Н/Д",
+                    'class': ""
+                })
 
     return render(request, 'web/compare_airplanes.html', {
         'selected_airplanes': selected_airplanes,
