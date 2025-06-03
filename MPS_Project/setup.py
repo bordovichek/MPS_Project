@@ -8,7 +8,6 @@ setup(
         "asgiref==3.8.1",
         "asttokens==3.0.0",
         "blessed==1.21.0",
-        "bpython==0.25",
         "certifi==2025.4.26",
         "charset-normalizer==3.4.2",
         "colorama==0.4.6",

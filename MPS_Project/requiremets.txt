@@ -2,6 +2,7 @@ ansicon==1.89.0
 asgiref==3.8.1
 asttokens==3.0.0
 blessed==1.21.0
+certifi==2025.4.26
 charset-normalizer==3.4.2
 colorama==0.4.6
 curtsies==0.4.2
@@ -30,6 +31,7 @@ python-dotenv==1.1.0
 pyxdg==0.28
 redis==6.2.0
 requests==2.32.3
+setuptools==80.9.0
 sqlparse==0.5.3
 stack-data==0.6.3
 traitlets==5.14.3
