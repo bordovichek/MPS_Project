@@ -1,0 +1,9 @@
+{% load ui %}
+<div class="compare-tray" data-compare-tray data-compare-url="{% url 'web:compare' %}" role="region" aria-label="Выбранные для сравнения самолёты" aria-live="polite">
+  <div class="compare-tray-text">
+    <strong data-compare-count></strong>
+    <span data-compare-names></span>
+  </div>
+  <a class="btn btn-primary btn-sm" data-compare-link href="{% url 'web:compare' %}">{% icon "scale" %} Сравнить</a>
+  <button class="icon-button is-small" type="button" data-compare-clear aria-label="Очистить выбор">{% icon "x" %}</button>
+</div>

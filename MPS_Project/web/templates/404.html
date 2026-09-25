@@ -1,0 +1,16 @@
+{% extends "web/base.html" %}
+{% load ui %}
+
+{% block title %}Страница не найдена{% endblock %}
+
+{% block content %}
+<div class="container error-page">
+  <div class="error-code">404</div>
+  <h1>Такого рейса нет</h1>
+  <p>Страница не найдена: возможно, ссылка устарела или в адресе опечатка.</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="{% url 'web:home' %}">{% icon "arrow-left" %} На главную</a>
+    <a class="btn" href="{% url 'web:planner' %}">{% icon "route" %} Построить маршрут</a>
+  </div>
+</div>
+{% endblock %}

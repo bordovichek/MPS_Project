@@ -1,0 +1,80 @@
+{% extends "web/base.html" %}
+{% load static ui %}
+
+{% block title %}Построение маршрута{% endblock %}
+{% block description %}Постройте авиамаршрут с учётом дальности самолёта: промежуточные посадки, время в пути и стоимость топлива.{% endblock %}
+{% block body_class %}planner-page{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="planner">
+  <section class="planner-panel" aria-label="Параметры маршрута">
+    <header>
+      <h1>Маршрут</h1>
+      <p>Выберите аэропорты в поиске или кликом по карте.</p>
+    </header>
+
+    <div class="panel-section">
+      <div class="panel-label">
+        <span>Точки маршрута</span>
+        <button class="btn btn-ghost btn-sm" type="button" data-action="reverse" title="Развернуть маршрут">{% icon "arrow-up-down" %} Обратно</button>
+      </div>
+      <ol class="waypoints" data-waypoints></ol>
+      <div class="panel-actions">
+        <button class="btn btn-sm" type="button" data-action="add">{% icon "plus" %} Добавить точку</button>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <label class="panel-label" for="airplane-select">Самолёт</label>
+      <select class="select" id="airplane-select" data-airplane>
+        <option value="">Без самолёта — только расстояние</option>
+        <optgroup label="В эксплуатации" data-group="active"></optgroup>
+        <optgroup label="Выведены из эксплуатации" data-group="retired"></optgroup>
+      </select>
+      <p class="airplane-hint" data-airplane-hint></p>
+    </div>
+
+    <div class="panel-section" data-criteria-section>
+      <span class="panel-label" id="criteria-label">Оптимизировать</span>
+      <div class="segmented criteria" role="radiogroup" aria-labelledby="criteria-label" data-criteria></div>
+    </div>
+
+    <div class="results" data-results aria-live="polite"></div>
+  </section>
+
+  <div class="planner-map">
+    <div id="map" aria-label="Карта маршрута"></div>
+    <div class="map-status" data-map-status hidden>{% icon "loader-circle" "spin" %}<span>Строим маршрут…</span></div>
+    <div class="map-legend" aria-hidden="true">
+      <span><i class="legend-swatch is-waypoint"></i>Точка маршрута</span>
+      <span><i class="legend-swatch is-stop"></i>Дозаправка</span>
+      <span><i class="legend-swatch is-airport"></i>Аэропорт</span>
+    </div>
+  </div>
+</div>
+
+<template id="waypoint-template">
+  <li class="waypoint">
+    <span class="waypoint-marker" aria-hidden="true"></span>
+    <div class="combobox">
+      <input class="input" type="text" role="combobox" autocomplete="off" spellcheck="false"
+             aria-autocomplete="list" aria-expanded="false">
+      <ul class="combobox-list" role="listbox" hidden></ul>
+    </div>
+    <button class="icon-button is-plain is-small waypoint-remove" type="button" aria-label="Убрать точку">{% icon "x" %}</button>
+  </li>
+</template>
+
+{{ planner_data|json_script:"planner-data" }}
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'vendor/leaflet/leaflet.js' %}"></script>
+  <script type="module" src="{% static 'web/js/planner.js' %}"></script>
+{% endblock %}

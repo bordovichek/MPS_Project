@@ -1,0 +1,42 @@
+{% load ui humanize %}
+<article class="card plane-card">
+  <div class="plane-media">
+    {% if airplane.image %}
+      <img src="{{ airplane.image.url }}" alt="{{ airplane.name }}" loading="lazy" decoding="async">
+    {% else %}
+      <div class="plane-placeholder">{% icon "plane" %}</div>
+    {% endif %}
+    <div class="plane-badges">
+      {% if airplane.in_service %}
+        <span class="badge badge-glass badge-success badge-dot">В эксплуатации</span>
+      {% else %}
+        <span class="badge badge-glass badge-warning badge-dot">Выведен</span>
+      {% endif %}
+    </div>
+  </div>
+  {% if with_compare %}
+    <button class="compare-toggle" type="button" aria-pressed="false"
+            data-compare-toggle data-id="{{ airplane.pk }}" data-name="{{ airplane.name }}">
+      <span class="when-off">{% icon "plus" %} Сравнить</span>
+      <span class="when-on">{% icon "check" %} В сравнении</span>
+    </button>
+  {% endif %}
+  <div class="plane-body">
+    <h2 class="plane-title"><a href="{{ airplane.get_absolute_url }}">{{ airplane.name }}</a></h2>
+    <p class="plane-subtitle">{{ airplane.engines|default:"Двигатели не указаны" }}{% if airplane.year_of_manufacture %} · {{ airplane.year_of_manufacture }}{% endif %}</p>
+    <div class="spec-row">
+      <div class="spec">
+        <div class="spec-value">{{ airplane.max_distance|intcomma }} км</div>
+        <div class="spec-label">дальность</div>
+      </div>
+      <div class="spec">
+        <div class="spec-value">{{ airplane.cruise_speed|intcomma }} км/ч</div>
+        <div class="spec-label">скорость</div>
+      </div>
+      <div class="spec">
+        <div class="spec-value">{{ airplane.capacity|default:"—" }}</div>
+        <div class="spec-label">мест</div>
+      </div>
+    </div>
+  </div>
+</article>

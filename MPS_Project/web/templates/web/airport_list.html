@@ -1,0 +1,79 @@
+{% extends "web/base.html" %}
+{% load ui humanize %}
+
+{% block title %}Аэропорты{% endblock %}
+{% block description %}Аэропорты с IATA-кодами: поиск, фильтр по стране, координаты и карта.{% endblock %}
+
+{% block content %}
+<div class="container">
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">{% icon "tower-control" %} Справочник</span>
+      <h1>Аэропорты</h1>
+      <p>{{ paginator.count|intcomma }} аэропортов{% if country %} в выбранной стране{% endif %}{% if query %} по запросу «{{ query }}»{% endif %}. Данные — OpenAIP.</p>
+    </div>
+    <a class="btn" href="{% url 'web:planner' %}">{% icon "map" %} На карте</a>
+  </header>
+
+  <form class="toolbar" method="get" data-autosubmit data-clean-empty role="search">
+    <div class="field grow">
+      <label class="field-label" for="airport-search">Поиск</label>
+      <div class="input-with-icon">
+        {% icon "search" %}
+        <input class="input" id="airport-search" type="search" name="q" value="{{ query }}" placeholder="Название или IATA-код: Pulkovo, SVO…">
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label" for="airport-country">Страна</label>
+      <select class="select" id="airport-country" name="country">
+        <option value="">Все страны</option>
+        {% for option in country_options %}
+          <option value="{{ option.code }}" {% if option.code == country %}selected{% endif %}>{{ option.code|flag }} {{ option.name }} ({{ option.total }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label class="field-label" for="airport-sort">Сортировка</label>
+      <select class="select" id="airport-sort" name="sort">
+        {% for value, label in sort_options.items %}
+          <option value="{{ value }}" {% if value == sort %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <noscript><button class="btn btn-primary" type="submit">Показать</button></noscript>
+  </form>
+
+  {% if airports %}
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">IATA</th>
+            <th scope="col">Название</th>
+            <th scope="col">Страна</th>
+            <th scope="col" class="num hide-sm">Координаты</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for airport in airports %}
+            <tr>
+              <td><span class="iata-tag">{{ airport.iata_code }}</span></td>
+              <td><a class="table-link" href="{{ airport.get_absolute_url }}">{{ airport.name }}</a></td>
+              <td><span class="country"><span class="flag" aria-hidden="true">{{ airport.country.unicode_flag }}</span>{{ airport.country.name }}</span></td>
+              <td class="num hide-sm">{% coords airport.latitude airport.longitude 3 %}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% include "web/partials/pagination.html" %}
+  {% else %}
+    <div class="empty-state">
+      {% icon "search" %}
+      <h2>Аэропорты не найдены</h2>
+      <p>Проверьте написание или выберите другую страну.</p>
+      <a class="btn" href="{% url 'web:airport_list' %}">{% icon "rotate-ccw" %} Сбросить фильтры</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

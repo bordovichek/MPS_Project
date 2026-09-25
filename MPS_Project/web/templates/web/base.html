@@ -1,0 +1,70 @@
+{% load static ui %}<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{% endblock %}{% block title_suffix %} — MPS Project{% endblock %}</title>
+  <meta name="description" content="{% block description %}Каталог самолётов и аэропортов и планировщик авиамаршрутов с учётом дальности полёта.{% endblock %}">
+  <meta name="color-scheme" content="light dark">
+  <script>
+    (() => {
+      let theme = null;
+      try { theme = localStorage.getItem("theme"); } catch {}
+      if (theme !== "light" && theme !== "dark") {
+        theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
+  <link rel="preload" href="{% static 'web/fonts/inter-cyrillic-wght-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+  {% block head %}{% endblock %}
+  <link rel="stylesheet" href="{% static 'web/css/app.css' %}">
+  <link rel="icon" href="{% static 'web/img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{% static 'web/img/apple-touch-icon.png' %}">
+</head>
+<body class="{% block body_class %}{% endblock %}" data-icons="{% static 'web/img/icons.svg' %}">
+  <a class="skip-link" href="#main">Перейти к содержимому</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="{% url 'web:home' %}" aria-label="MPS Project — на главную">
+        <span class="brand-mark">{% icon "plane" %}</span>
+        <span class="brand-name">MPS <span>Project</span></span>
+      </a>
+
+      <nav class="site-nav" id="site-nav" aria-label="Основная навигация">
+        <a class="nav-link {% nav_active 'planner' %}" href="{% url 'web:planner' %}">{% icon "route" %}<span>Маршрут</span></a>
+        <a class="nav-link {% nav_active 'airplane_list' 'airplane_detail' %}" href="{% url 'web:airplane_list' %}">{% icon "plane" %}<span>Самолёты</span></a>
+        <a class="nav-link {% nav_active 'airport_list' 'airport_detail' %}" href="{% url 'web:airport_list' %}">{% icon "tower-control" %}<span>Аэропорты</span></a>
+        <a class="nav-link {% nav_active 'compare' %}" href="{% url 'web:compare' %}">{% icon "scale" %}<span>Сравнение</span></a>
+        <a class="nav-link" href="{% url 'api:root' %}">{% icon "code-xml" %}<span>API</span></a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="icon-button" type="button" data-theme-toggle aria-label="Переключить тему" title="Светлая / тёмная тема">
+          {% icon "moon" "show-in-light" %}{% icon "sun" "show-in-dark" %}
+        </button>
+        <button class="icon-button nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Меню">
+          {% icon "menu" %}
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="site-main">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% block footer %}
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p>MPS Project — учебный проект группы ИКБО-42-23: Хомяков&nbsp;В.&nbsp;Н., Власов&nbsp;И.&nbsp;Д., Лазурин&nbsp;Е.&nbsp;Е.</p>
+        <p>Данные аэропортов — <a href="https://www.openaip.net" target="_blank" rel="noopener">OpenAIP</a> · <a href="{% url 'api:root' %}">REST API</a></p>
+      </div>
+    </footer>
+  {% endblock %}
+
+  <script type="module" src="{% static 'web/js/app.js' %}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
