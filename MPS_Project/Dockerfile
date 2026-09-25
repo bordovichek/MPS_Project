@@ -1,10 +1,23 @@
-FROM python:3.12
-ENV PYTHONUNBUFFERED 1
-ENV DJANGO_SETTINGS_MODULE MPS_Project.settings
+FROM python:3.13-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
 WORKDIR /app
-COPY requiremets.txt /app/
-RUN pip install --no-cache-dir -r requiremets.txt
-COPY . /app/
-RUN python manage.py collectstatic --noinput
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+RUN useradd --system --create-home app \
+    && mkdir -p staticfiles media \
+    && chown -R app:app /app \
+    && chmod +x docker-entrypoint.sh
+
 EXPOSE 8000
-CMD ["/app/gunicorn_start.sh"]
+
+# Стартуем от root только ради chown томов — entrypoint сразу переключается на пользователя app.
+ENTRYPOINT ["./docker-entrypoint.sh"]
+CMD ["gunicorn", "MPS_Project.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--access-logfile", "-"]

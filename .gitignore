@@ -1,23 +1,20 @@
-# Python cache
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Virtual environment
+*.py[cod]
 .venv/
+venv/
 .env
-# Django stuff:
+
 *.log
-*.pot
-*.pyc
-db.sqlite3
-media/
+*.sqlite3
+/MPS_Project/staticfiles/
+/MPS_Project/media/*
+!/MPS_Project/media/seed/
 
-# PyCharm IDE files
 .idea/
+.vscode/
 *.iml
-
-# System files
 .DS_Store
 Thumbs.db
+.ruff_cache/
+.coverage
+htmlcov/
