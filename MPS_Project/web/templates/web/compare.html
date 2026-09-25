@@ -1,0 +1,107 @@
+{% extends "web/base.html" %}
+{% load static ui humanize %}
+
+{% block title %}Сравнение самолётов{% endblock %}
+{% block description %}Сравните до трёх моделей самолётов: дальность, скорость, вместимость и расход топлива.{% endblock %}
+
+{% block content %}
+<div class="container">
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">{% icon "scale" %} Сравнение</span>
+      <h1>Сравнение самолётов</h1>
+      <p>Выберите две или три модели. Лучшее значение подсвечено зелёным, худшее из трёх — красным.</p>
+    </div>
+  </header>
+
+  <form class="card card-pad compare-form" method="get" data-clean-empty>
+    {% for slot in slots %}
+      <div class="field">
+        <label class="field-label" for="compare-{{ forloop.counter }}">Самолёт {{ forloop.counter }}{% if forloop.counter == 3 %} (необязательно){% endif %}</label>
+        <select class="select" id="compare-{{ forloop.counter }}" name="ids">
+          <option value="">— не выбран —</option>
+          {% for airplane in airplanes %}
+            <option value="{{ airplane.pk }}" {% if slot and slot.pk == airplane.pk %}selected{% endif %}>{{ airplane.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    {% endfor %}
+    <button class="btn btn-primary" type="submit">{% icon "scale" %} Сравнить</button>
+  </form>
+
+  <div class="section">
+    {% if rows %}
+      <div class="compare-scroll">
+        <div class="compare-table" style="--cols: {{ selected|length }}">
+          <div class="compare-row">
+            <div class="compare-metric">Модель</div>
+            {% for airplane in selected %}
+              <div class="compare-plane">
+                <a class="plane-media" href="{{ airplane.get_absolute_url }}" tabindex="-1" aria-hidden="true">
+                  {% if airplane.image %}
+                    <img src="{{ airplane.image.url }}" alt="" loading="lazy">
+                  {% else %}
+                    <div class="plane-placeholder">{% icon "plane" %}</div>
+                  {% endif %}
+                </a>
+                <a class="compare-plane-name" href="{{ airplane.get_absolute_url }}">{{ airplane.name }}</a>
+                <div>
+                  {% if airplane.in_service %}
+                    <span class="badge badge-success badge-dot">В эксплуатации</span>
+                  {% else %}
+                    <span class="badge badge-warning badge-dot">Выведен</span>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          {% for row in rows %}
+            <div class="compare-row">
+              <div class="compare-metric">{{ row.metric.label }}{% if row.metric.unit %}<small>{{ row.metric.unit }}</small>{% endif %}</div>
+              {% for cell in row.cells %}
+                <div class="compare-cell {% if cell.verdict %}is-{{ cell.verdict }}{% endif %}" style="--share: {{ cell.share|stringformat:'.3f' }}">
+                  <div class="compare-value">
+                    {% if cell.value is None %}—{% else %}{{ cell.value|floatformat:row.metric.number_format }}{% endif %}
+                    {% if cell.verdict == "best" %}<span class="verdict">лучше всех</span>{% elif cell.verdict == "worst" %}<span class="verdict">хуже всех</span>{% endif %}
+                  </div>
+                  {% if row.metric.better %}<div class="compare-bar"><span></span></div>{% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          {% endfor %}
+
+          <div class="compare-row">
+            <div class="compare-metric">Двигатели</div>
+            {% for airplane in selected %}
+              <div class="compare-cell">{{ airplane.engines|default:"—" }}</div>
+            {% endfor %}
+          </div>
+          <div class="compare-row">
+            <div class="compare-metric">Маршрут</div>
+            {% for airplane in selected %}
+              <div class="compare-cell"><a class="btn btn-sm" href="{% url 'web:planner' %}?plane={{ airplane.pk }}">{% icon "route" %} На карте</a></div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <p class="compare-legend">
+        <span>Длина полосы — значение относительно максимального среди выбранных.</span>
+        <span>Расход на пассажира = расход, кг/ч ÷ (места × скорость) × 100.</span>
+      </p>
+    {% elif selected %}
+      <div class="empty-state">
+        {% icon "scale" %}
+        <h2>Добавьте ещё один самолёт</h2>
+        <p>Для сравнения нужно минимум две модели.</p>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        {% icon "scale" %}
+        <h2>Выберите самолёты для сравнения</h2>
+        <p>Воспользуйтесь формой выше или отметьте модели кнопкой «Сравнить» в <a href="{% url 'web:airplane_list' %}">каталоге</a>.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

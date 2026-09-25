@@ -1,0 +1,73 @@
+{% extends "web/base.html" %}
+{% load static ui %}
+
+{% block title %}Самолёты{% endblock %}
+{% block description %}Каталог моделей самолётов: дальность, скорость, вместимость и расход топлива.{% endblock %}
+
+{% block content %}
+<div class="container">
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">{% icon "plane" %} Каталог</span>
+      <h1>Самолёты</h1>
+      <p>Характеристики, которые учитывает планировщик: дальность ограничивает перелёт, скорость и расход определяют время и топливо.</p>
+    </div>
+    <a class="btn" href="{% url 'web:compare' %}">{% icon "scale" %} Сравнение</a>
+  </header>
+
+  <form class="toolbar" method="get" data-autosubmit data-clean-empty role="search">
+    <div class="field grow">
+      <label class="field-label" for="plane-search">Поиск</label>
+      <div class="input-with-icon">
+        {% icon "search" %}
+        <input class="input" id="plane-search" type="search" name="q" value="{{ query }}" placeholder="Модель или двигатель: Boeing, A320, PW1100G…">
+      </div>
+    </div>
+    <div class="field field-fixed">
+      <span class="field-label" id="status-label">Статус</span>
+      <div class="segmented" role="radiogroup" aria-labelledby="status-label">
+        {% for value, label in status_options.items %}
+          <label>
+            <input type="radio" name="status" value="{{ value }}" {% if value == status %}checked{% endif %}>
+            <span>{{ label }}</span>
+          </label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label" for="plane-sort">Сортировка</label>
+      <select class="select" id="plane-sort" name="sort">
+        {% for value, label in sort_options.items %}
+          <option value="{{ value }}" {% if value == sort %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <noscript><button class="btn btn-primary" type="submit">Показать</button></noscript>
+  </form>
+
+  {% if query or status %}
+    <p class="result-count">Найдено: {{ airplanes|length }} из {{ total }}</p>
+  {% endif %}
+
+  {% if airplanes %}
+    <div class="plane-grid">
+      {% for airplane in airplanes %}
+        {% include "web/partials/airplane_card.html" with with_compare=True %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      {% icon "search" %}
+      <h2>Ничего не нашлось</h2>
+      <p>Попробуйте изменить запрос или сбросить фильтры.</p>
+      <a class="btn" href="{% url 'web:airplane_list' %}">{% icon "rotate-ccw" %} Сбросить</a>
+    </div>
+  {% endif %}
+</div>
+
+{% include "web/partials/compare_tray.html" %}
+{% endblock %}
+
+{% block scripts %}
+  <script type="module" src="{% static 'web/js/compare.js' %}"></script>
+{% endblock %}
