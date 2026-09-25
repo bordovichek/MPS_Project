@@ -2,12 +2,11 @@ import { cssVar, onThemeChange } from "./utils.js";
 
 const L = window.L;
 
-const TILES = {
-  light: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-  dark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-};
-const ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
+// Стандартные тайлы OSM: единственный публичный источник без API-ключа и регистрации
+// (у CARTO и большинства альтернатив с 2024–2025 бесплатный доступ закрыт ключом).
+// Тёмную тему делаем CSS-инверсией слоя тайлов, а не отдельным источником.
+const TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+const ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 const currentTheme = () => (document.documentElement.dataset.theme === "dark" ? "dark" : "light");
 
@@ -28,11 +27,9 @@ export function createMap(element, { landUrl, ...options } = {}) {
   });
   map.attributionControl.setPrefix(false);
 
-  const tiles = L.tileLayer(TILES[currentTheme()], {
-    subdomains: "abcd",
-    maxZoom: 19,
-    attribution: ATTRIBUTION,
-  }).addTo(map);
+  const tiles = L.tileLayer(TILE_URL, { maxZoom: 19, attribution: ATTRIBUTION }).addTo(map);
+  const applyTileTheme = () => map.getPane("tilePane").classList.toggle("is-dark-tiles", currentTheme() === "dark");
+  applyTileTheme();
 
   let land = null;
   let failures = 0;
@@ -65,7 +62,7 @@ export function createMap(element, { landUrl, ...options } = {}) {
   });
 
   onThemeChange(() => {
-    tiles.setUrl(TILES[currentTheme()]);
+    applyTileTheme();
     if (land && land !== "loading") land.setStyle(landStyle());
   });
 

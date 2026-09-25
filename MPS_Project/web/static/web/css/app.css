@@ -2766,6 +2766,12 @@ code,
   color: var(--accent);
 }
 
+/* Тёмная тема: у OSM нет бесплатных тёмных тайлов без ключа, поэтому инвертируем обычные —
+   инверсия задета только на слое тайлов, маркеры и подписи лежат в других pane и не искажаются. */
+.leaflet-tile-pane.is-dark-tiles {
+  filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9);
+}
+
 .leaflet-bar {
   border: 1px solid var(--border) !important;
   border-radius: 10px !important;
