@@ -1,0 +1,402 @@
+[
+  {
+    "model": "core.airplane",
+    "pk": 1,
+    "fields": {
+      "name": "Boeing 777-300ER",
+      "year_of_manufacture": 2004,
+      "capacity": 396,
+      "engines": "2 × GE90-115B",
+      "consumption": 7500,
+      "cruise_speed": 905,
+      "max_distance": 13650,
+      "in_service": true,
+      "description": "Дальнемагистральный широкофюзеляжный лайнер, используемый на международных рейсах. Отличается высокой надёжностью. Является модификацией Boeing 777-300 с увеличенной дальностью полета, известная как \"Extended Range\". Этот самолет отличается усиленным фюзеляжем, крылом, оперением и пилонами двигателей, а также новыми стойками шасси и дополнительными топливными баками.",
+      "image": "seed/airplanes/boeing-777-300er.webp"
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 2,
+    "fields": {
+      "name": "Cessna 172 Skyhawk",
+      "year_of_manufacture": 1956,
+      "capacity": 4,
+      "engines": "1 × Lycoming IO-360",
+      "consumption": 27,
+      "cruise_speed": 226,
+      "max_distance": 1185,
+      "in_service": true,
+      "description": "Американский лёгкий одномоторный самолёт, широко используемый в летной подготовке, частных полетах и для различных других целей. Это один из самых популярных лёгких самолётов в мире, отличающийся простотой управления, надёжностью и универсальностью.",
+      "image": "seed/airplanes/cessna-172.webp"
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 3,
+    "fields": {
+      "name": "Boeing 737-800",
+      "year_of_manufacture": 1998,
+      "capacity": 189,
+      "engines": "2 × CFM56-7B",
+      "consumption": 2500,
+      "cruise_speed": 850,
+      "max_distance": 5665,
+      "in_service": true,
+      "description": "Один из самых популярных узкофюзеляжных самолётов, широко используемый бюджетными авиакомпаниями. Несмотря на возраст, остаётся основой флота многих перевозчиков.",
+      "image": "seed/airplanes/boeing-737-800.webp"
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 4,
+    "fields": {
+      "name": "Airbus A320neo",
+      "year_of_manufacture": 2016,
+      "capacity": 180,
+      "engines": "2 × CFM LEAP-1A / PW1100G",
+      "consumption": 2400,
+      "cruise_speed": 840,
+      "max_distance": 6300,
+      "in_service": true,
+      "description": "Модернизированная версия A320 с улучшенной топливной эффективностью. Один из самых продаваемых самолётов в мире.",
+      "image": "seed/airplanes/airbus-a320neo.webp"
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 5,
+    "fields": {
+      "name": "Airbus A380-800",
+      "year_of_manufacture": 2007,
+      "capacity": 853,
+      "engines": "4 × Rolls-Royce Trent 900 / Engine Alliance GP7200",
+      "consumption": 13000,
+      "cruise_speed": 903,
+      "max_distance": 15200,
+      "in_service": true,
+      "description": "Это самый большой пассажирский самолет в мире, разработанный компанией Airbus S.A.S. Он является широкофюзеляжным двухпалубным самолетом с четырьмя двигателями.",
+      "image": "seed/airplanes/airbus-a380-800.webp"
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 6,
+    "fields": {
+      "name": "Tupolev Tu-204",
+      "year_of_manufacture": 1996,
+      "capacity": 210,
+      "engines": "2 × ПС-90А",
+      "consumption": 5800,
+      "cruise_speed": 850,
+      "max_distance": 9300,
+      "in_service": true,
+      "description": "Российский среднемагистральный авиалайнер, эксплуатируется в основном внутри страны.",
+      "image": "seed/airplanes/tupolev-tu-204.webp"
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 7,
+    "fields": {
+      "name": "Comac C919",
+      "year_of_manufacture": 2023,
+      "capacity": 174,
+      "engines": "2 × CFM LEAP-1C",
+      "consumption": 2800,
+      "cruise_speed": 830,
+      "max_distance": 5555,
+      "in_service": true,
+      "description": "Китайский аналог A320 и 737, активно эксплуатируется внутри Китая.",
+      "image": "seed/airplanes/comac-c919.webp"
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 8,
+    "fields": {
+      "name": "Ilyushin Il-96",
+      "year_of_manufacture": 1993,
+      "capacity": 262,
+      "engines": "4 × ПС-90А",
+      "consumption": 8000,
+      "cruise_speed": 870,
+      "max_distance": 12000,
+      "in_service": true,
+      "description": "Широкофюзеляжный лайнер российского производства, используется на дальних маршрутах.",
+      "image": "seed/airplanes/ilyushin-il-96.webp"
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 9,
+    "fields": {
+      "name": "Sukhoi Superjet 100",
+      "year_of_manufacture": 2011,
+      "capacity": 98,
+      "engines": "2 × PowerJet SaM146",
+      "consumption": 2900,
+      "cruise_speed": 820,
+      "max_distance": 4400,
+      "in_service": true,
+      "description": "Российский региональный самолёт, активно эксплуатируется внутри страны.",
+      "image": "seed/airplanes/sukhoi-superjet-100.webp"
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 10,
+    "fields": {
+      "name": "Concorde",
+      "year_of_manufacture": 1976,
+      "capacity": 100,
+      "engines": "4 × Rolls-Royce/Snecma Olympus 593",
+      "consumption": 25600,
+      "cruise_speed": 2180,
+      "max_distance": 6667,
+      "in_service": false,
+      "description": "Сверхзвуковой пассажирский самолёт, совместная разработка Франции и Великобритании. Был способен пересекать Атлантику менее чем за 3 часа. Выведен из регулярной эксплуатации в 2003 году, но остаётся иконой гражданской авиации.",
+      "image": "seed/airplanes/concorde.webp"
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 11,
+    "fields": {
+      "name": "Airbus A320",
+      "year_of_manufacture": 1987,
+      "capacity": 150,
+      "engines": "2 × CFM56-5 / IAE V2500",
+      "consumption": 2400,
+      "cruise_speed": 828,
+      "max_distance": 6100,
+      "in_service": true,
+      "description": "Коротко- и среднемагистральный пассажирский самолёт, один из самых популярных и экономичных в мире. Он первым внедрил цифровую электродистанционную систему управления (fly-by-wire). A320 является основой для широкого семейства узкофюзеляжных самолётов Airbus",
+      "image": ""
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 12,
+    "fields": {
+      "name": "Airbus A350-900",
+      "year_of_manufacture": 2013,
+      "capacity": 325,
+      "engines": "2 × Rolls-Royce Trent XWB-84",
+      "consumption": 6500,
+      "cruise_speed": 903,
+      "max_distance": 15000,
+      "in_service": true,
+      "description": "Дальнемагистральный широкофюзеляжный пассажирский самолёт, значительная часть которого выполнена из композитных материалов. Он разработан для повышения топливной эффективности и снижения эксплуатационных расходов. A350-900 предлагает высокий уровень комфорта для пассажиров на длительных рейсах.",
+      "image": ""
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 13,
+    "fields": {
+      "name": "Boeing 747-400",
+      "year_of_manufacture": 1989,
+      "capacity": 416,
+      "engines": "4 × PW4000 / CF6-80C2 / RB211-524",
+      "consumption": 11000,
+      "cruise_speed": 913,
+      "max_distance": 13450,
+      "in_service": true,
+      "description": "Культовый широкофюзеляжный дальнемагистральный пассажирский самолёт, широко известный как \"Королева небес\" или \"Джамбо Джет\". Эта модификация включала значительные улучшения в авионике и конструкции. Boeing 747-400 был основным игроком на дальних маршрутах по всему миру.",
+      "image": ""
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 14,
+    "fields": {
+      "name": "Boeing 787-9 Dreamliner",
+      "year_of_manufacture": 2013,
+      "capacity": 290,
+      "engines": "2 × GEnx-1B / Rolls-Royce Trent 1000",
+      "consumption": 5200,
+      "cruise_speed": 903,
+      "max_distance": 14140,
+      "in_service": true,
+      "description": "Дальнемагистральный широкофюзеляжный самолёт, известный своей высокой топливной эффективностью благодаря использованию композитных материалов. Dreamliner предлагает пассажирам улучшенный комфорт за счет более высокого давления в салоне и влажности. Это одна из ключевых моделей в современном парке многих авиакомпаний.",
+      "image": ""
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 15,
+    "fields": {
+      "name": "Embraer E195-E2",
+      "year_of_manufacture": 2017,
+      "capacity": 146,
+      "engines": "2 × PW1900G",
+      "consumption": 1800,
+      "cruise_speed": 870,
+      "max_distance": 4800,
+      "in_service": true,
+      "description": "Крупнейший представитель семейства E-Jet E2, разработанный для оптимизации эксплуатационных расходов и повышения производительности. Он отличается низким уровнем шума и выбросов, а также просторным салоном. E195-E2 является конкурентом для более крупных региональных самолётов и небольших магистральных.",
+      "image": ""
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 16,
+    "fields": {
+      "name": "Bombardier CRJ900",
+      "year_of_manufacture": 2001,
+      "capacity": 90,
+      "engines": "2 × GE CF34-8C5",
+      "consumption": 1600,
+      "cruise_speed": 830,
+      "max_distance": 2900,
+      "in_service": true,
+      "description": "Региональный реактивный самолёт, разработанный на базе CRJ200, но с увеличенной вместимостью и улучшенными характеристиками. Он широко используется авиакомпаниями для обслуживания коротких и средних маршрутов. CRJ900 ценится за свою надёжность и операционную эффективность.",
+      "image": ""
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 17,
+    "fields": {
+      "name": "ATR 72-600",
+      "year_of_manufacture": 2010,
+      "capacity": 74,
+      "engines": "2 × PW127M",
+      "consumption": 700,
+      "cruise_speed": 510,
+      "max_distance": 1500,
+      "in_service": true,
+      "description": "Двухмоторный турбовинтовой самолёт, предназначенный для региональных и коротких маршрутов. Он известен своей топливной экономичностью и способностью работать с относительно короткими взлетно-посадочными полосами. ATR 72-600 является одним из самых популярных турбовинтовых самолётов в мире.",
+      "image": ""
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 18,
+    "fields": {
+      "name": "Saab 340",
+      "year_of_manufacture": 1983,
+      "capacity": 34,
+      "engines": "2 × GE CT7-9B",
+      "consumption": 500,
+      "cruise_speed": 467,
+      "max_distance": 1730,
+      "in_service": true,
+      "description": "Шведский двухмоторный турбовинтовой самолёт, разработанный для региональных авиалиний. Он известен своей надёжностью и простотой в обслуживании. Saab 340 широко использовался различными авиакомпаниями по всему миру для коротких перелётов.",
+      "image": ""
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 19,
+    "fields": {
+      "name": "Fokker 100",
+      "year_of_manufacture": 1986,
+      "capacity": 107,
+      "engines": "2 × Rolls-Royce Tay 650",
+      "consumption": 2200,
+      "cruise_speed": 845,
+      "max_distance": 3170,
+      "in_service": false,
+      "description": "Голландский региональный реактивный самолёт, популярный в 1990-х годах за свою экономичность на коротких маршрутах. Fokker 100 был известен своим комфортным салоном и надёжностью.",
+      "image": ""
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 20,
+    "fields": {
+      "name": "Airbus A220-300",
+      "year_of_manufacture": 2016,
+      "capacity": 140,
+      "engines": "2 × PW1500G",
+      "consumption": 1900,
+      "cruise_speed": 829,
+      "max_distance": 6300,
+      "in_service": true,
+      "description": "Современный узкофюзеляжный самолёт, изначально разработанный Bombardier как CSeries. Он отличается высокой топливной эффективностью, низким уровнем шума и комфортным салоном для пассажиров. A220-300 идеально подходит для региональных и среднемагистральных маршрутов.",
+      "image": ""
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 21,
+    "fields": {
+      "name": "Gulfstream G650ER",
+      "year_of_manufacture": 2014,
+      "capacity": 19,
+      "engines": "2 × Rolls-Royce BR725",
+      "consumption": 1100,
+      "cruise_speed": 956,
+      "max_distance": 13890,
+      "in_service": true,
+      "description": "Высокоскоростной бизнес-джет с исключительной дальностью полёта, способный связывать практически любые две точки на Земле. Он известен своей скоростью и инновациями в кабине и салоне. G650ER является одним из самых желанных частных самолётов в мире.",
+      "image": ""
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 22,
+    "fields": {
+      "name": "Pilatus PC-12",
+      "year_of_manufacture": 1994,
+      "capacity": 9,
+      "engines": "1 × PT6A-67P",
+      "consumption": 250,
+      "cruise_speed": 519,
+      "max_distance": 3400,
+      "in_service": true,
+      "description": "Одномоторный турбовинтовой самолёт, крайне универсальный и популярный как для корпоративных, так и для чартерных перевозок. Он может эксплуатироваться с неподготовленных взлетно-посадочных полос. PC-12 ценится за свою надёжность и низкие эксплуатационные расходы.",
+      "image": ""
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 23,
+    "fields": {
+      "name": "Dassault Falcon 8X",
+      "year_of_manufacture": 2016,
+      "capacity": 16,
+      "engines": "3 × PW307D",
+      "consumption": 1000,
+      "cruise_speed": 900,
+      "max_distance": 11945,
+      "in_service": true,
+      "description": "Дальнемагистральный бизнес-джет, известный своими тремя двигателями и высокой производительностью. Он предлагает один из самых длинных салонов в своём классе, обеспечивая исключительный комфорт. Falcon 8X способен совершать беспосадочные перелёты на очень большие расстояния.",
+      "image": ""
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 24,
+    "fields": {
+      "name": "Boeing 757-200",
+      "year_of_manufacture": 1982,
+      "capacity": 239,
+      "engines": "2 × RB211-535 / PW2000",
+      "consumption": 4500,
+      "cruise_speed": 850,
+      "max_distance": 7250,
+      "in_service": true,
+      "description": "Среднемагистральный узкофюзеляжный самолёт, часто используемый для дальнемагистральных чартерных рейсов. Он отличается мощными двигателями и отличными взлётно-посадочными характеристиками. Boeing 757-200 был очень популярен среди авиакомпаний благодаря своей универсальности.",
+      "image": ""
+    }
+  },
+  {
+    "model": "core.airplane",
+    "pk": 25,
+    "fields": {
+      "name": "Airbus A321XLR",
+      "year_of_manufacture": 2019,
+      "capacity": 200,
+      "engines": "2 × CFM LEAP-1A / PW1100G",
+      "consumption": 2900,
+      "cruise_speed": 860,
+      "max_distance": 8700,
+      "in_service": true,
+      "description": "Airbus A321XLR (Extra Long Range) — это новейшая модификация узкофюзеляжного самолета семейства A320neo, разработанная для выполнения сверхдальних рейсов. Он способен соединять города, которые ранее требовали широкофюзеляжных самолетов, что открывает новые маршруты для авиакомпаний. Благодаря дополнительному топливному баку и модификациям шасси, A321XLR значительно увеличивает дальность полета при сохранении топливной эффективности. Этот самолет предлагает гибкость для авиакомпаний и комфорт для",
+      "image": ""
+    }
+  }
+]

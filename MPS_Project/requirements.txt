@@ -1,0 +1,10 @@
+Django==5.2.17
+djangorestframework==3.18.1
+django-countries==9.1.0
+numpy==2.5.3
+pillow==12.3.0
+requests==2.34.2
+python-dotenv==1.2.3
+psycopg[binary]==3.3.6
+redis==8.1.0
+gunicorn==26.2.0
